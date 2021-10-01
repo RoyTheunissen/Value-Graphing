@@ -12,6 +12,7 @@ namespace RoyTheunissen.Graphing.UI
         [SerializeField] private Material material;
         [SerializeField] private GraphCanvasVisualizer graphCanvasVisualizer;
         [SerializeField] private Color gridColor = new Color(0.25f, 0.25f, 0.25f, 0);
+        [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 0);
 
         private void OnPostRender()
         {
@@ -70,7 +71,7 @@ namespace RoyTheunissen.Graphing.UI
         private void DrawHorizontalLine(GraphDataUI dataUi, float value)
         {
             float y = dataUi.GetNormalizedPosition(0.0f, value).y;
-            DrawLine(dataUi, new Vector2(0.0f, y), new Vector2(1.0f, y), gridColor);
+            DrawLine(dataUi, new Vector2(0.0f, y), new Vector2(1.0f, y), value.Equal(0.0f) ? axisColor : gridColor);
         }
 
         private void DrawVerticalLine(GraphDataUI dataUi, float time)

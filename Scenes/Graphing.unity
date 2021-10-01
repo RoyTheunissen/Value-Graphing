@@ -332,6 +332,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 894cd9d284b82c348b3ad6d99bec7d24, type: 2}
   graphCanvasVisualizer: {fileID: 1026762774}
   gridColor: {r: 0, g: 0, b: 0, a: 1}
+  axisColor: {r: 0.05, g: 0.05, b: 0.05, a: 1}
 --- !u!20 &2121328930
 Camera:
   m_ObjectHideFlags: 0
