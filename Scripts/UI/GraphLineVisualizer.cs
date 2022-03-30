@@ -1,18 +1,47 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
+
+#if UNITY_2020_3_OR_NEWER
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+#endif // #if UNITY_2020_3_OR_NEWER
 
 namespace RoyTheunissen.Graphing.UI
 {
     /// <summary>
     /// Responsible for drawing the lines of a graph. This part uses GL instead of the canvas because it's way faster.
     /// </summary>
-    public sealed class GraphLineVisualizer : MonoBehaviour 
+    public sealed class GraphLineVisualizer : MonoBehaviour
     {
+        [SerializeField] private new Camera camera;
+        
         [SerializeField] private Material material;
         [SerializeField] private GraphCanvasVisualizer graphCanvasVisualizer;
         [SerializeField] private Color gridColor = new Color(0.25f, 0.25f, 0.25f, 0);
         [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 0);
+        
+#if UNITY_2020_3_OR_NEWER
+        private void OnEnable()
+        {
+            RenderPipelineManager.endCameraRendering += EndCameraRendering;
+
+            // Make sure we add this camera to the camera stack.
+            UniversalAdditionalCameraData additionalCameraData =
+                Camera.main.GetComponent<UniversalAdditionalCameraData>();
+            additionalCameraData.cameraStack.Add(camera);
+        }
+
+        private void EndCameraRendering(ScriptableRenderContext scriptableRenderContext, Camera camera)
+        {
+            OnPostRender();
+        }
+
+        private void OnDisable()
+        {
+            RenderPipelineManager.endCameraRendering -= EndCameraRendering;
+        }
+#endif // UNITY_2020_3_OR_NEWER
 
         private void OnPostRender()
         {
