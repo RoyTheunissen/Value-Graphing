@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_2020_3_OR_NEWER
+#if URP
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-
-#endif // #if UNITY_2020_3_OR_NEWER
+#endif // #if URP
 
 namespace RoyTheunissen.Graphing.UI
 {
@@ -21,7 +20,7 @@ namespace RoyTheunissen.Graphing.UI
         [SerializeField] private Color gridColor = new Color(0.25f, 0.25f, 0.25f, 0);
         [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 0);
         
-#if UNITY_2020_3_OR_NEWER
+#if URP
         private void OnEnable()
         {
             RenderPipelineManager.endCameraRendering += EndCameraRendering;
@@ -41,7 +40,7 @@ namespace RoyTheunissen.Graphing.UI
         {
             RenderPipelineManager.endCameraRendering -= EndCameraRendering;
         }
-#endif // UNITY_2020_3_OR_NEWER
+#endif // URP
 
         private void OnPostRender()
         {
