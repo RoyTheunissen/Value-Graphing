@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RoyTheunissen.Scaffolding.Services;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace RoyTheunissen.Graphing
     /// </summary>
     public class Graph
     {
+        private const string DummyGraphName = "_Dummy";
+
         public string Name => DefaultLine.Name;
         
         public Color Color => DefaultLine.Color;
@@ -52,25 +55,30 @@ namespace RoyTheunissen.Graphing
         public float TimeStart => Mathf.Max(startTime, Time.time - duration);
         public float TimeEnd => Time.time;
 
+        private bool IsDummy => Name == DummyGraphName;
+        
+        private static readonly Graph dummyGraph = new Graph(DummyGraphName);
+
         private static ServiceReference<GraphingService> graphingService = new ServiceReference<GraphingService>();
         
         public delegate void LineAddedHandler(Graph graph, GraphLine line);
         public event LineAddedHandler LineAddedEvent;
 
-        public Graph(string name, Color color, float duration = 3.0f)
+        public Graph(string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
         {
             this.duration = duration;
             
             startTime = Time.time;
             
             // Create a default graph line. You can add others if you wish.
-            AddLine(name, color);
-
+            AddLine(name, color, valueGetter);
+            
             // Auto-register.
-            IsRegistered = true;
+            if (!IsDummy)
+                IsRegistered = true;
         }
 
-        public Graph(string name) : this(name, Color.green)
+        public Graph(string name, Func<float> valueGetter = null) : this(name, Color.green, valueGetter)
         {
         }
         
@@ -83,9 +91,9 @@ namespace RoyTheunissen.Graphing
             }
         }
 
-        public GraphLine AddLine(string name, Color color)
+        public GraphLine AddLine(string name, Color color, Func<float> valueGetter = null)
         {
-            GraphLine line = new GraphLine(lines.Count, name, color);
+            GraphLine line = new GraphLine(lines.Count, name, color, valueGetter);
             lines.Add(line);
             
             line.PointAddedEvent += HandlePointAddedEvent;
@@ -122,11 +130,31 @@ namespace RoyTheunissen.Graphing
             lines[lineIndex].AddValue(value);
         }
 
+#if UNITY_EDITOR || ENABLE_GRAPHS
         public void Update()
         {
-#if UNITY_EDITOR || ENABLE_GRAPHS
+            foreach (GraphLine line in lines)
+            {
+                line.Update();
+            }
+            
             CullOldPoints();
+        }
 #endif // UNITY_EDITOR || ENABLE_GRAPHS
+
+        public static Graph Get(string name)
+        {
+            return graphingService.Reference.GraphsByName.TryGetValue(name, out Graph graph) ? graph : null;
+        }
+
+        public static Graph Create(bool isGraphEnabled, string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
+        {
+            return !isGraphEnabled ? dummyGraph : new Graph(name, color, valueGetter, duration);
+        }
+        
+        public static Graph Create(bool isGraphEnabled, string name, Func<float> valueGetter = null)
+        {
+            return !isGraphEnabled ? dummyGraph : new Graph(name, valueGetter);
         }
     }
     
@@ -144,14 +172,23 @@ namespace RoyTheunissen.Graphing
         private List<GraphPoint> points = new List<GraphPoint>();
         public List<GraphPoint> Points => points;
 
+        private Func<float> valueGetter;
+
         public delegate void PointAddedHandler(GraphLine graphLine, float value);
         public event PointAddedHandler PointAddedEvent;
 
-        public GraphLine(int index, string name, Color color)
+        public GraphLine(int index, string name, Color color, Func<float> valueGetter = null)
         {
             this.index = index;
             this.name = name;
             this.color = color;
+            this.valueGetter = valueGetter;
+        }
+
+        public GraphLine SetValueGetter(Func<float> valueGetter)
+        {
+            this.valueGetter = valueGetter;
+            return this;
         }
         
         public void AddValue(float value)
@@ -168,6 +205,17 @@ namespace RoyTheunissen.Graphing
                 if (points[i].time < time)
                     points.RemoveAt(i);
             }
+        }
+
+        public void Update()
+        {
+#if UNITY_EDITOR || ENABLE_GRAPHS
+            if (valueGetter != null)
+            {
+                float currentValue = valueGetter();
+                AddValue(currentValue);
+            }
+#endif // UNITY_EDITOR || ENABLE_GRAPHS
         }
     }
 
