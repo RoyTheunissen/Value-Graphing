@@ -43,9 +43,9 @@ namespace RoyTheunissen.Graphing.UI
 
         private void CreateUiForPreExistingGraphs()
         {
-            foreach (Graph graph in graphingService.Reference.Graphs)
+            foreach (KeyValuePair<string, Graph> kvp in graphingService.Reference.GraphsByName)
             {
-                CreateUiForGraph(graph);
+                CreateUiForGraph(kvp.Value);
             }
         }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using RoyTheunissen.Scaffolding.Services;
 using UnityEngine;
@@ -11,8 +10,8 @@ namespace RoyTheunissen.Graphing
     /// </summary>
     public sealed class GraphingService : MonoBehaviour, IDefaultService
     {
-        private readonly List<Graph> graphs = new List<Graph>();
-        public List<Graph> Graphs => graphs;
+        private readonly Dictionary<string, Graph> graphsByName = new Dictionary<string, Graph>();
+        public Dictionary<string, Graph> GraphsByName => graphsByName;
 
         private bool didLoadGraphingScene;
 
@@ -43,14 +42,14 @@ namespace RoyTheunissen.Graphing
         {
             LoadGraphingScene();
             
-            graphs.Add(graph);
+            graphsByName.Add(graph.Name, graph);
             
             GraphAddedEvent?.Invoke(this, graph);
         }
         
         public void Remove(Graph graph)
         {
-            graphs.Remove(graph);
+            graphsByName.Remove(graph.Name);
             
             GraphRemovedEvent?.Invoke(this, graph);
         }
@@ -58,9 +57,9 @@ namespace RoyTheunissen.Graphing
 #if UNITY_EDITOR || ENABLE_GRAPHS
         private void Update()
         {
-            foreach (Graph graph in graphs)
+            foreach (KeyValuePair<string, Graph> kvp in graphsByName)
             {
-                graph.Update();
+                kvp.Value.Update();
             }
         }
 #endif // UNITY_EDITOR || ENABLE_GRAPHS
