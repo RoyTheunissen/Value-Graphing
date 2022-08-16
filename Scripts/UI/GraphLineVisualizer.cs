@@ -27,7 +27,7 @@ namespace RoyTheunissen.Graphing.UI
 
             // Make sure we add this camera to the camera stack.
             UniversalAdditionalCameraData additionalCameraData =
-                Camera.main.GetComponent<UniversalAdditionalCameraData>();
+                Camera.main.GetOrAddComponent<UniversalAdditionalCameraData>();
             additionalCameraData.cameraStack.Add(camera);
         }
 
