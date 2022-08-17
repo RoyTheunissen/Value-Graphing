@@ -144,14 +144,27 @@ namespace RoyTheunissen.Graphing
 
         public static Graph Get(string name)
         {
-            return graphingService.Reference.GraphsByName.TryGetValue(name, out Graph graph) ? graph : null;
+            bool didExist = graphingService.Reference.GraphsByName.TryGetValue(name, out Graph graph);
+            if (!didExist)
+                graph = Create(name);
+            return graph;
+        }
+
+        public static Graph Create(string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
+        {
+            return Create(true, name, color, valueGetter, duration);
         }
 
         public static Graph Create(bool isGraphEnabled, string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
         {
             return !isGraphEnabled ? dummyGraph : new Graph(name, color, valueGetter, duration);
         }
-        
+
+        public static Graph Create(string name, Func<float> valueGetter = null)
+        {
+            return Create(true, name, valueGetter);
+        }
+
         public static Graph Create(bool isGraphEnabled, string name, Func<float> valueGetter = null)
         {
             return !isGraphEnabled ? dummyGraph : new Graph(name, valueGetter);
