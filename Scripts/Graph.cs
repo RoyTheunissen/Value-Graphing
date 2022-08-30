@@ -144,9 +144,14 @@ namespace RoyTheunissen.Graphing
 
         public static Graph Get(string name)
         {
+            return Get(name, Color.green);
+        }
+
+        public static Graph Get(string name, Color color)
+        {
             bool didExist = graphingService.Reference.GraphsByName.TryGetValue(name, out Graph graph);
             if (!didExist)
-                graph = Create(name);
+                graph = Create(name, color);
             return graph;
         }
 
