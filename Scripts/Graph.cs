@@ -50,6 +50,7 @@ namespace RoyTheunissen.Graphing
         private GraphLine DefaultLine => lines[0];
 
         private readonly List<GraphLine> lines = new List<GraphLine>();
+        private readonly Dictionary<string, GraphLine> linesByName = new Dictionary<string, GraphLine>();
         public List<GraphLine> Lines => lines;
         
         public float TimeStart => Mathf.Max(startTime, Time.time - duration);
@@ -89,18 +90,27 @@ namespace RoyTheunissen.Graphing
             {
                 lines[i].PointAddedEvent -= HandlePointAddedEvent;
             }
+            lines.Clear();
+            linesByName.Clear();
         }
 
         public GraphLine AddLine(string name, Color color, Func<float> valueGetter = null)
         {
             GraphLine line = new GraphLine(lines.Count, name, color, valueGetter);
             lines.Add(line);
+            linesByName.Add(name, line);
             
             line.PointAddedEvent += HandlePointAddedEvent;
             
             LineAddedEvent?.Invoke(this, line);
             
             return line;
+        }
+        
+        public GraphLine GetLine(string name, Color color, Func<float> valueGetter = null)
+        {
+            bool didExist = linesByName.TryGetValue(name, out GraphLine line);
+            return didExist ? line : AddLine(name, color, valueGetter);
         }
 
         private void HandlePointAddedEvent(GraphLine graphLine, float value)
@@ -119,15 +129,16 @@ namespace RoyTheunissen.Graphing
             }
         }
 
-        public void AddValue(float value, int lineIndex = 0)
+        public Graph AddValue(float value, int lineIndex = 0)
         {
             if (lineIndex < 0 || lineIndex >= lines.Count)
             {
                 Debug.LogWarning($"Tried to add value to invalid line index {lineIndex} for graph '{Name}'");
-                return;
+                return this;
             }
             
             lines[lineIndex].AddValue(value);
+            return this;
         }
 
 #if UNITY_EDITOR || ENABLE_GRAPHS
