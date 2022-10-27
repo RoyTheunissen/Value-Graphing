@@ -65,24 +65,27 @@ namespace RoyTheunissen.Graphing
         public delegate void LineAddedHandler(Graph graph, GraphLine line);
         public event LineAddedHandler LineAddedEvent;
 
-        public Graph(string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
+        public Graph(
+            string name, Color color, Func<float> valueGetter = null,
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             this.duration = duration;
-            
+
             startTime = Time.time;
-            
+
             // Create a default graph line. You can add others if you wish.
-            AddLine(name, color, valueGetter);
-            
+            AddLine(name, color, valueGetter, mode);
+
             // Auto-register.
             if (!IsDummy)
                 IsRegistered = true;
         }
 
-        public Graph(string name, Func<float> valueGetter = null) : this(name, Color.green, valueGetter)
+        public Graph(string name, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
+            : this(name, Color.green, valueGetter, mode)
         {
         }
-        
+
         public void InternalCleanup()
         {
             IsRegistered = false;
@@ -94,19 +97,27 @@ namespace RoyTheunissen.Graphing
             linesByName.Clear();
         }
 
-        public GraphLine AddLine(string name, Color color, Func<float> valueGetter = null)
+        public Graph SetDuration(float duration)
         {
-            GraphLine line = new GraphLine(lines.Count, name, color, valueGetter);
+            this.duration = duration;
+            return this;
+        }
+
+        public GraphLine AddLine(
+            string name, Color color, Func<float> valueGetter = null,
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
+        {
+            GraphLine line = new GraphLine(this, lines.Count, name, color, valueGetter, mode);
             lines.Add(line);
             linesByName.Add(name, line);
-            
+
             line.PointAddedEvent += HandlePointAddedEvent;
-            
+
             LineAddedEvent?.Invoke(this, line);
-            
+
             return line;
         }
-        
+
         public GraphLine GetLine(string name, Color color, Func<float> valueGetter = null)
         {
             bool didExist = linesByName.TryGetValue(name, out GraphLine line);
@@ -166,29 +177,40 @@ namespace RoyTheunissen.Graphing
             return graph;
         }
 
-        public static Graph Create(string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
+        public static Graph Create(string name, Color color, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
-            return Create(true, name, color, valueGetter, duration);
+            return Create(true, name, color, valueGetter, mode, duration);
         }
 
-        public static Graph Create(bool isGraphEnabled, string name, Color color, Func<float> valueGetter = null, float duration = 3.0f)
+        public static Graph Create(bool isGraphEnabled, string name, Color color, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
-            return !isGraphEnabled ? dummyGraph : new Graph(name, color, valueGetter, duration);
+            return !isGraphEnabled ? dummyGraph : new Graph(name, color, valueGetter, mode, duration);
         }
 
-        public static Graph Create(string name, Func<float> valueGetter = null)
+        public static Graph Create(string name, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
         {
-            return Create(true, name, valueGetter);
+            return Create(true, name, valueGetter, mode);
         }
 
-        public static Graph Create(bool isGraphEnabled, string name, Func<float> valueGetter = null)
+        public static Graph Create(
+            bool isGraphEnabled, string name, Func<float> valueGetter = null,
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
         {
-            return !isGraphEnabled ? dummyGraph : new Graph(name, valueGetter);
+            return !isGraphEnabled ? dummyGraph : new Graph(name, valueGetter, mode);
         }
     }
     
     public class GraphLine
     {
+        public enum Modes
+        {
+            ContinuousLine,
+            VerticalLineAtEveryPoint,
+        }
+        
+        private Graph graph;
+        public Graph Graph => graph;
+
         private int index;
         public int Index => index;
 
@@ -197,7 +219,10 @@ namespace RoyTheunissen.Graphing
 
         private Color color;
         public Color Color => color;
-        
+
+        private Modes mode;
+        public Modes Mode => mode;
+
         private List<GraphPoint> points = new List<GraphPoint>();
         public List<GraphPoint> Points => points;
 
@@ -206,17 +231,26 @@ namespace RoyTheunissen.Graphing
         public delegate void PointAddedHandler(GraphLine graphLine, float value);
         public event PointAddedHandler PointAddedEvent;
 
-        public GraphLine(int index, string name, Color color, Func<float> valueGetter = null)
+        public GraphLine(
+            Graph graph, int index, string name, Color color, Func<float> valueGetter = null, Modes mode = Modes.ContinuousLine)
         {
+            this.graph = graph;
             this.index = index;
             this.name = name;
             this.color = color;
             this.valueGetter = valueGetter;
+            this.mode = mode;
         }
 
         public GraphLine SetValueGetter(Func<float> valueGetter)
         {
             this.valueGetter = valueGetter;
+            return this;
+        }
+        
+        public GraphLine SetMode(Modes mode)
+        {
+            this.mode = mode;
             return this;
         }
         

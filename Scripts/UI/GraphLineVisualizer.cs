@@ -72,17 +72,27 @@ namespace RoyTheunissen.Graphing.UI
         {
             Color color = line.Color;
             Color lineColor = new Color(color.r, color.g, color.b, color.a / 2);
-            int lineCount = line.Points.Count;
+            int pointCount = line.Points.Count;
             
             tempVertexPairs.Clear();
 
-            for (int i = 1; i < lineCount; i++)
+            for (int i = 1; i < pointCount; i++)
             {
                 if (line.Points[i].time < graph.TimeStart)
                     continue;
                 
                 if (line.Points[i].time > graph.TimeEnd)
                     return;
+
+                if (line.Mode == GraphLine.Modes.VerticalLineAtEveryPoint)
+                {
+                    Vector2 posTop = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMax);
+                    Vector2 posBottom = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMin);
+                    tempVertexPairs.Add(
+                        NormalizedGraphPositionToViewPosition(dataUi, posBottom),
+                        NormalizedGraphPositionToViewPosition(dataUi, posTop));
+                    continue;
+                }
                 
                 Vector2 posPrev = dataUi.GetNormalizedPosition(line.Points[i - 1].time, line.Points[i - 1].value);
                 Vector2 pos = dataUi.GetNormalizedPosition(line.Points[i].time, line.Points[i].value);
