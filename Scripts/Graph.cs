@@ -102,6 +102,25 @@ namespace RoyTheunissen.Graphing
             this.duration = duration;
             return this;
         }
+        
+        public Graph SetMinValue(float minValue)
+        {
+            valueMin = minValue;
+            return this;
+        }
+        
+        public Graph SetMaxValue(float maxValue)
+        {
+            valueMax = maxValue;
+            return this;
+        }
+        
+        public Graph SetRange(float minValue, float maxValue)
+        {
+            valueMin = minValue;
+            valueMax = maxValue;
+            return this;
+        }
 
         public GraphLine AddLine(
             string name, Color color, Func<float> valueGetter = null,
