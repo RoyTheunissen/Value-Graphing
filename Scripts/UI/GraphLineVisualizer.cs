@@ -1,3 +1,4 @@
+//#define NO_GRADIENTS
 // #define GRADIENT_FOR_SINGLE_LINES_ONLY
 
 using System.Collections.Generic;
@@ -80,11 +81,15 @@ namespace RoyTheunissen.Graphing.UI
             Color lineColor = new Color(color.r, color.g, color.b, color.a / 2);
             int pointCount = line.Points.Count;
 
-#if GRADIENT_FOR_SINGLE_LINES_ONLY
-            bool drawGradientUnderLine = graph.Lines.Count == 1;
+#if NO_GRADIENTS
+            bool drawGradientUnderLine = false;
 #else
+    #if GRADIENT_FOR_SINGLE_LINES_ONLY
+            bool drawGradientUnderLine = graph.Lines.Count == 1;
+    #else
             const bool drawGradientUnderLine = true;
-#endif // GRADIENT_FOR_SINGLE_LINES_ONLY
+    #endif // GRADIENT_FOR_SINGLE_LINES_ONLY
+#endif // NO_GRADIENTS
             
             if (drawGradientUnderLine)
                 tempUnderLineGradientQuadVertices.Clear();
