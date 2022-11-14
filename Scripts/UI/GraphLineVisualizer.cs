@@ -1,3 +1,5 @@
+// #define GRADIENT_FOR_SINGLE_LINES_ONLY
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +15,8 @@ namespace RoyTheunissen.Graphing.UI
     /// </summary>
     public sealed class GraphLineVisualizer : MonoBehaviour
     {
+        private const float GradientUnderLineOpacity = 0.075f;
+        
         [SerializeField] private new Camera camera;
         
         [SerializeField] private Material material;
@@ -67,14 +71,25 @@ namespace RoyTheunissen.Graphing.UI
             }
         }
 
-        private static readonly List<Vector3> tempVertexPairs = new List<Vector3>();
+        private static readonly List<Vector3> tempLineVertexPairs = new List<Vector3>();
+        private static readonly List<Vector4> tempUnderLineGradientQuadVertices = new List<Vector4>();
+        
         private void DrawGraphValueLine(Graph graph, GraphDataUI dataUi, GraphLine line)
         {
             Color color = line.Color;
             Color lineColor = new Color(color.r, color.g, color.b, color.a / 2);
             int pointCount = line.Points.Count;
+
+#if GRADIENT_FOR_SINGLE_LINES_ONLY
+            bool drawGradientUnderLine = graph.Lines.Count == 1;
+#else
+            const bool drawGradientUnderLine = true;
+#endif // GRADIENT_FOR_SINGLE_LINES_ONLY
             
-            tempVertexPairs.Clear();
+            if (drawGradientUnderLine)
+                tempUnderLineGradientQuadVertices.Clear();
+            
+            tempLineVertexPairs.Clear();
 
             for (int i = 1; i < pointCount; i++)
             {
@@ -88,7 +103,7 @@ namespace RoyTheunissen.Graphing.UI
                 {
                     Vector2 posTop = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMax);
                     Vector2 posBottom = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMin);
-                    tempVertexPairs.Add(
+                    tempLineVertexPairs.Add(
                         NormalizedGraphPositionToViewPosition(dataUi, posBottom),
                         NormalizedGraphPositionToViewPosition(dataUi, posTop));
                     continue;
@@ -97,13 +112,27 @@ namespace RoyTheunissen.Graphing.UI
                 Vector2 posPrev = dataUi.GetNormalizedPosition(line.Points[i - 1].time, line.Points[i - 1].value);
                 Vector2 pos = dataUi.GetNormalizedPosition(line.Points[i].time, line.Points[i].value);
 
-                tempVertexPairs.Add(
-                    NormalizedGraphPositionToViewPosition(dataUi, posPrev),
-                    NormalizedGraphPositionToViewPosition(dataUi, pos));
+                Vector3 posPrevGraph = NormalizedGraphPositionToViewPosition(dataUi, posPrev);
+                Vector3 posCurrentGraph = NormalizedGraphPositionToViewPosition(dataUi, pos);
+                
+                if (drawGradientUnderLine)
+                {
+                    Vector3 posPrevAtBottomGraph = NormalizedGraphPositionToViewPosition(dataUi, posPrev.WithY(0.0f));
+                    Vector3 posCurrentAtBottomGraph = NormalizedGraphPositionToViewPosition(dataUi, pos.WithY(0.0f));
+                    tempUnderLineGradientQuadVertices.Add(
+                        posPrevAtBottomGraph.WithW(0.0f), posPrevGraph.WithW(1.0f),
+                        posCurrentGraph.WithW(1.0f), posCurrentAtBottomGraph.WithW(0.0f));
+                }
+                
+                tempLineVertexPairs.Add(posPrevGraph, posCurrentGraph);
             }
 
+            // Draw a cheeky gradient under the line because it helps with readability. But mostly it just looks great.
+            if (drawGradientUnderLine)
+                DrawQuads(tempUnderLineGradientQuadVertices, lineColor.WithA(lineColor.a * GradientUnderLineOpacity));
+            
             // Draw the whole line in one go, this is the fastest.
-            DrawLine(tempVertexPairs, lineColor);
+            DrawLine(tempLineVertexPairs, lineColor);
         }
 
         private void DrawHorizontalLine(GraphDataUI dataUi, float value)
@@ -136,8 +165,25 @@ namespace RoyTheunissen.Graphing.UI
             to = NormalizedGraphPositionToViewPosition(dataUi, to);
             DrawLine(from, to, color);
         }
+        
+        private void StartDrawingQuads(Color color)
+        {
+            GL.PushMatrix();
+            material.SetPass(0);
+            GL.LoadOrtho();
 
-        private void StartDrawing(Color color)
+            GL.Begin(GL.QUADS);
+            GL.Color(color);
+        }
+        
+        private void StopDrawingQuads()
+        {
+            GL.End();
+
+            GL.PopMatrix();
+        }
+
+        private void StartDrawingLines(Color color)
         {
             GL.PushMatrix();
             material.SetPass(0);
@@ -147,7 +193,7 @@ namespace RoyTheunissen.Graphing.UI
             GL.Color(color);
         }
         
-        private void StopDrawing()
+        private void StopDrawingLines()
         {
             GL.End();
 
@@ -159,10 +205,10 @@ namespace RoyTheunissen.Graphing.UI
         /// </summary>
         private void DrawLine(Vector2 from, Vector2 to, Color color)
         {
-            StartDrawing(color);
+            StartDrawingLines(color);
             GL.Vertex(from);
             GL.Vertex(to);
-            StopDrawing();
+            StopDrawingLines();
         }
         
         /// <summary>
@@ -170,12 +216,26 @@ namespace RoyTheunissen.Graphing.UI
         /// </summary>
         private void DrawLine(List<Vector3> pairedPositions, Color color)
         {
-            StartDrawing(color);
+            StartDrawingLines(color);
             for (int i = 0; i < pairedPositions.Count; i++)
             {
                 GL.Vertex(pairedPositions[i]);
             }
-            StopDrawing();
+            StopDrawingLines();
+        }
+        
+        /// <summary>
+        /// Draw a line between a list of quad positions. A quad is drawn between every 4 points.
+        /// </summary>
+        private void DrawQuads(List<Vector4> corners, Color color)
+        {
+            StartDrawingQuads(color);
+            for (int i = 0; i < corners.Count; i++)
+            {
+                GL.Color(color.WithA(color.a * corners[i].w));
+                GL.Vertex(corners[i]);
+            }
+            StopDrawingQuads();
         }
     }
 }

@@ -7,7 +7,8 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags {"Queue"="Transparent" "IgnoreProjector"="True"}
+        Blend SrcAlpha OneMinusSrcAlpha
         LOD 100
 
         Pass
@@ -53,8 +54,6 @@
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
                 
                 // Apply color property.
                 col *= _Color;
