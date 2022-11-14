@@ -281,10 +281,16 @@ namespace RoyTheunissen.Graphing
 
         public void CullPointsBefore(float time)
         {
-            // Remove points that are too far big to show up anyway.
+            // Remove points that wouldn't be visible anyway.
             for (int i = points.Count - 1; i >= 0; i--)
             {
-                if (points[i].time < time)
+                // NOTE: If there is a point after this one and that one ISN'T before the specified time, don't cull
+                // it yet, because then this current point is useful for drawing a line from 0 to the first value.
+                // The point would theoretically end up to the left of the graph (because it's smaller than MinTime)
+                // but this is clamped anyway. This check prevents a gap forming at the left of the first valud point.
+                bool hasNextPoint = i + 1 < points.Count;
+                bool nextPointIsTooOld = hasNextPoint && points[i + 1].time < time;
+                if (points[i].time < time && nextPointIsTooOld)
                     points.RemoveAt(i);
             }
         }
