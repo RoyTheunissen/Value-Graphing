@@ -82,12 +82,11 @@ namespace RoyTheunissen.Graphing.UI
             int pointCount = line.Points.Count;
 
 #if NO_GRADIENTS
-            bool drawGradientUnderLine = false;
+            const bool drawGradientUnderLine = false;
 #else
+            bool drawGradientUnderLine = line.Mode != GraphLine.Modes.Threshold;
     #if GRADIENT_FOR_SINGLE_LINES_ONLY
-            bool drawGradientUnderLine = graph.Lines.Count == 1;
-    #else
-            const bool drawGradientUnderLine = true;
+            drawGradientUnderLine = drawGradientUnderLine && graph.Lines.Count == 1;
     #endif // GRADIENT_FOR_SINGLE_LINES_ONLY
 #endif // NO_GRADIENTS
             
@@ -96,40 +95,54 @@ namespace RoyTheunissen.Graphing.UI
             
             tempLineVertexPairs.Clear();
 
-            for (int i = 1; i < pointCount; i++)
+            if (line.Mode == GraphLine.Modes.Threshold)
             {
-                if (line.Points[i].time < graph.TimeStart)
-                    continue;
-                
-                if (line.Points[i].time > graph.TimeEnd)
-                    return;
-
-                if (line.Mode == GraphLine.Modes.VerticalLineAtEveryPoint)
+                float thresholdValue = line.Points[line.Points.Count - 1].value;
+                Vector2 posLeft = dataUi.GetNormalizedPosition(graph.TimeStart, thresholdValue);
+                Vector2 posRight = dataUi.GetNormalizedPosition(graph.TimeEnd, thresholdValue);
+                tempLineVertexPairs.Add(
+                    NormalizedGraphPositionToViewPosition(dataUi, posLeft),
+                    NormalizedGraphPositionToViewPosition(dataUi, posRight));
+            }
+            else
+            {
+                for (int i = 1; i < pointCount; i++)
                 {
-                    Vector2 posTop = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMax);
-                    Vector2 posBottom = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMin);
-                    tempLineVertexPairs.Add(
-                        NormalizedGraphPositionToViewPosition(dataUi, posBottom),
-                        NormalizedGraphPositionToViewPosition(dataUi, posTop));
-                    continue;
-                }
-                
-                Vector2 posPrev = dataUi.GetNormalizedPosition(line.Points[i - 1].time, line.Points[i - 1].value);
-                Vector2 pos = dataUi.GetNormalizedPosition(line.Points[i].time, line.Points[i].value);
+                    if (line.Points[i].time < graph.TimeStart)
+                        continue;
 
-                Vector3 posPrevGraph = NormalizedGraphPositionToViewPosition(dataUi, posPrev);
-                Vector3 posCurrentGraph = NormalizedGraphPositionToViewPosition(dataUi, pos);
-                
-                if (drawGradientUnderLine)
-                {
-                    Vector3 posPrevAtBottomGraph = NormalizedGraphPositionToViewPosition(dataUi, posPrev.WithY(0.0f));
-                    Vector3 posCurrentAtBottomGraph = NormalizedGraphPositionToViewPosition(dataUi, pos.WithY(0.0f));
-                    tempUnderLineGradientQuadVertices.Add(
-                        posPrevAtBottomGraph.WithW(0.0f), posPrevGraph.WithW(1.0f),
-                        posCurrentGraph.WithW(1.0f), posCurrentAtBottomGraph.WithW(0.0f));
+                    if (line.Points[i].time > graph.TimeEnd)
+                        return;
+
+                    if (line.Mode == GraphLine.Modes.VerticalLineAtEveryPoint)
+                    {
+                        Vector2 posTop = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMax);
+                        Vector2 posBottom = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMin);
+                        tempLineVertexPairs.Add(
+                            NormalizedGraphPositionToViewPosition(dataUi, posBottom),
+                            NormalizedGraphPositionToViewPosition(dataUi, posTop));
+                        continue;
+                    }
+
+                    Vector2 posPrev = dataUi.GetNormalizedPosition(line.Points[i - 1].time, line.Points[i - 1].value);
+                    Vector2 pos = dataUi.GetNormalizedPosition(line.Points[i].time, line.Points[i].value);
+
+                    Vector3 posPrevGraph = NormalizedGraphPositionToViewPosition(dataUi, posPrev);
+                    Vector3 posCurrentGraph = NormalizedGraphPositionToViewPosition(dataUi, pos);
+
+                    if (drawGradientUnderLine)
+                    {
+                        Vector3 posPrevAtBottomGraph =
+                            NormalizedGraphPositionToViewPosition(dataUi, posPrev.WithY(0.0f));
+                        Vector3 posCurrentAtBottomGraph =
+                            NormalizedGraphPositionToViewPosition(dataUi, pos.WithY(0.0f));
+                        tempUnderLineGradientQuadVertices.Add(
+                            posPrevAtBottomGraph.WithW(0.0f), posPrevGraph.WithW(1.0f),
+                            posCurrentGraph.WithW(1.0f), posCurrentAtBottomGraph.WithW(0.0f));
+                    }
+
+                    tempLineVertexPairs.Add(posPrevGraph, posCurrentGraph);
                 }
-                
-                tempLineVertexPairs.Add(posPrevGraph, posCurrentGraph);
             }
 
             // Draw a cheeky gradient under the line because it helps with readability. But mostly it just looks great.

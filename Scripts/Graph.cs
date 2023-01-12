@@ -137,10 +137,12 @@ namespace RoyTheunissen.Graphing
             return line;
         }
 
-        public GraphLine GetLine(string name, Color color, Func<float> valueGetter = null)
+        public GraphLine GetLine(
+            string name, Color color, Func<float> valueGetter = null,
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
         {
             bool didExist = linesByName.TryGetValue(name, out GraphLine line);
-            return didExist ? line : AddLine(name, color, valueGetter);
+            return didExist ? line : AddLine(name, color, valueGetter, mode);
         }
 
         private void HandlePointAddedEvent(GraphLine graphLine, float value)
@@ -168,6 +170,18 @@ namespace RoyTheunissen.Graphing
             }
             
             lines[lineIndex].AddValue(value);
+            return this;
+        }
+        
+        public Graph SetThreshold(float value, int lineIndex)
+        {
+            if (lineIndex < 0 || lineIndex >= lines.Count)
+            {
+                Debug.LogWarning($"Tried to add value to invalid line index {lineIndex} for graph '{Name}'");
+                return this;
+            }
+            
+            lines[lineIndex].SetThreshold(value);
             return this;
         }
 
@@ -225,6 +239,7 @@ namespace RoyTheunissen.Graphing
         {
             ContinuousLine,
             VerticalLineAtEveryPoint,
+            Threshold,
         }
         
         private Graph graph;
@@ -273,10 +288,25 @@ namespace RoyTheunissen.Graphing
             return this;
         }
         
-        public void AddValue(float value)
+        public GraphLine AddValue(float value)
         {
             points.Add(new GraphPoint(Time.time, value));
             PointAddedEvent?.Invoke(this, value);
+            return this;
+        }
+
+        public GraphLine SetThreshold(float value)
+        {
+            if (Mode == Modes.Threshold)
+            {
+                points.Clear();
+                AddValue(value);
+                return this;
+            }
+            
+            Debug.LogWarning($"Trying to set threshold of line '{name}' " +
+                             $"but we're not a threshold line, we are a {mode} line.");
+            return this;
         }
 
         public void CullPointsBefore(float time)
