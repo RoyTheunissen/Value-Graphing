@@ -173,6 +173,11 @@ namespace RoyTheunissen.Graphing
             return this;
         }
         
+        public Graph AddValue(bool value, int lineIndex = 0)
+        {
+            return AddValue(value ? 1.0f : 0.0f, lineIndex);
+        }
+        
         public Graph SetThreshold(float value, int lineIndex)
         {
             if (lineIndex < 0 || lineIndex >= lines.Count)
