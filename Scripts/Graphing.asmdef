@@ -1,10 +1,7 @@
 {
     "name": "Graphing",
     "rootNamespace": "RoyTheunissen.Graphing",
-    "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:cfb27f12ae60ab9439e723272ec29f06"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
