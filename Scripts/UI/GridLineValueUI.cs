@@ -1,5 +1,5 @@
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RoyTheunissen.Graphing.UI
 {
@@ -9,7 +9,7 @@ namespace RoyTheunissen.Graphing.UI
     public sealed class GridLineValueUI : MonoBehaviour
     {
         [SerializeField] private RectTransform rectTransform;
-        [SerializeField] private TMP_Text text;
+        [SerializeField] private Text text;
 
         public void UpdatePosition(float position, float value)
         {
