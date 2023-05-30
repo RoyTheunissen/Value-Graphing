@@ -2,6 +2,7 @@
 // #define GRADIENT_FOR_SINGLE_LINES_ONLY
 
 using System.Collections.Generic;
+using RoyTheunissen.Graphing.Utilities;
 using UnityEngine;
 
 #if URP
@@ -100,9 +101,8 @@ namespace RoyTheunissen.Graphing.UI
                 float thresholdValue = line.Points[line.Points.Count - 1].value;
                 Vector2 posLeft = dataUi.GetNormalizedPosition(graph.TimeStart, thresholdValue);
                 Vector2 posRight = dataUi.GetNormalizedPosition(graph.TimeEnd, thresholdValue);
-                tempLineVertexPairs.Add(
-                    NormalizedGraphPositionToViewPosition(dataUi, posLeft),
-                    NormalizedGraphPositionToViewPosition(dataUi, posRight));
+                tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posLeft));
+                tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posRight));
             }
             else
             {
@@ -118,9 +118,8 @@ namespace RoyTheunissen.Graphing.UI
                     {
                         Vector2 posTop = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMax);
                         Vector2 posBottom = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMin);
-                        tempLineVertexPairs.Add(
-                            NormalizedGraphPositionToViewPosition(dataUi, posBottom),
-                            NormalizedGraphPositionToViewPosition(dataUi, posTop));
+                        tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posBottom));
+                        tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posTop));
                         continue;
                     }
 
@@ -136,12 +135,15 @@ namespace RoyTheunissen.Graphing.UI
                             NormalizedGraphPositionToViewPosition(dataUi, posPrev.WithY(0.0f));
                         Vector3 posCurrentAtBottomGraph =
                             NormalizedGraphPositionToViewPosition(dataUi, pos.WithY(0.0f));
-                        tempUnderLineGradientQuadVertices.Add(
-                            posPrevAtBottomGraph.WithW(0.0f), posPrevGraph.WithW(1.0f),
-                            posCurrentGraph.WithW(1.0f), posCurrentAtBottomGraph.WithW(0.0f));
+                        
+                        tempUnderLineGradientQuadVertices.Add(posPrevAtBottomGraph.WithW(0.0f));
+                        tempUnderLineGradientQuadVertices.Add(posPrevGraph.WithW(1.0f));
+                        tempUnderLineGradientQuadVertices.Add(posCurrentGraph.WithW(1.0f));
+                        tempUnderLineGradientQuadVertices.Add(posCurrentAtBottomGraph.WithW(0.0f));
                     }
 
-                    tempLineVertexPairs.Add(posPrevGraph, posCurrentGraph);
+                    tempLineVertexPairs.Add(posPrevGraph);
+                    tempLineVertexPairs.Add(posCurrentGraph);
                 }
             }
 
@@ -156,7 +158,8 @@ namespace RoyTheunissen.Graphing.UI
         private void DrawHorizontalLine(GraphDataUI dataUi, float value)
         {
             float y = dataUi.GetNormalizedPosition(0.0f, value).y;
-            DrawLine(dataUi, new Vector2(0.0f, y), new Vector2(1.0f, y), value.Equal(0.0f) ? axisColor : gridColor);
+            DrawLine(
+                dataUi, new Vector2(0.0f, y), new Vector2(1.0f, y), value.Approximately(0.0f) ? axisColor : gridColor);
         }
 
         private void DrawVerticalLine(GraphDataUI dataUi, float time)
