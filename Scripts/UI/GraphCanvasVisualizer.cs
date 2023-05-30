@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using RoyTheunissen.Scaffolding.Services;
 using UnityEngine;
 
 namespace RoyTheunissen.Graphing.UI
@@ -17,8 +16,6 @@ namespace RoyTheunissen.Graphing.UI
         private Dictionary<Graph, GraphUI> graphUis = new Dictionary<Graph, GraphUI>();
         public Dictionary<Graph, GraphUI> GraphUis => graphUis;
 
-        private ServiceReference<GraphingService> graphingService = new ServiceReference<GraphingService>();
-
         private void Awake()
         {
             foreach (GameObject go in objectsThatShouldPersistBetweenScenes)
@@ -28,22 +25,19 @@ namespace RoyTheunissen.Graphing.UI
             
             CreateUiForPreExistingGraphs();
 
-            graphingService.Reference.GraphAddedEvent += HandleGraphAddedEvent;
-            graphingService.Reference.GraphRemovedEvent += HandleGraphRemovedEvent;
+            GraphingService.Instance.GraphAddedEvent += HandleGraphAddedEvent;
+            GraphingService.Instance.GraphRemovedEvent += HandleGraphRemovedEvent;
         }
 
         private void OnDestroy()
         {
-            if (graphingService.Exists)
-            {
-                graphingService.Reference.GraphAddedEvent -= HandleGraphAddedEvent;
-                graphingService.Reference.GraphRemovedEvent -= HandleGraphRemovedEvent;
-            }
+            GraphingService.Instance.GraphAddedEvent -= HandleGraphAddedEvent;
+            GraphingService.Instance.GraphRemovedEvent -= HandleGraphRemovedEvent;
         }
 
         private void CreateUiForPreExistingGraphs()
         {
-            foreach (KeyValuePair<string, Graph> kvp in graphingService.Reference.GraphsByName)
+            foreach (KeyValuePair<string, Graph> kvp in GraphingService.Instance.GraphsByName)
             {
                 CreateUiForGraph(kvp.Value);
             }

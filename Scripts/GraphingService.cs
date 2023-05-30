@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using RoyTheunissen.Scaffolding.Services;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace RoyTheunissen.Graphing
@@ -8,12 +6,29 @@ namespace RoyTheunissen.Graphing
     /// <summary>
     /// Responsible for drawing graphs, which is very useful for debugging.
     /// </summary>
-    public sealed class GraphingService : MonoBehaviour, IDefaultService
+    public sealed class GraphingService
     {
         private readonly Dictionary<string, Graph> graphsByName = new Dictionary<string, Graph>();
         public Dictionary<string, Graph> GraphsByName => graphsByName;
 
         private bool didLoadGraphingScene;
+
+        // Will use a singleton pattern for now as this package is needed for projects that use dependency injection
+        // instead of the service locator pattern.
+        private static bool didCacheInstance;
+        private static GraphingService instance;
+        public static GraphingService Instance
+        {
+            get
+            {
+                if (!didCacheInstance)
+                {
+                    instance = new GraphingService();
+                    didCacheInstance = true;
+                }
+                return instance;
+            }
+        }
 
         public delegate void GraphAddedHandler(GraphingService graphingService, Graph graph);
         public event GraphAddedHandler GraphAddedEvent;
@@ -21,7 +36,7 @@ namespace RoyTheunissen.Graphing
         public delegate void GraphRemovedHandler(GraphingService graphingService, Graph graph);
         public event GraphRemovedHandler GraphRemovedEvent;
 
-        private void Awake()
+        public void Load()
         {
             LoadGraphingScene();
         }

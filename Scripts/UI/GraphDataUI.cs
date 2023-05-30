@@ -1,4 +1,3 @@
-using RoyTheunissen.Scaffolding.Pooling;
 using UnityEngine;
 
 namespace RoyTheunissen.Graphing.UI
