@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using RoyTheunissen.Scaffolding.Services;
 using UnityEngine;
 
 namespace RoyTheunissen.Graphing
@@ -37,13 +36,10 @@ namespace RoyTheunissen.Graphing
                 
                 isRegistered = value;
                 
-                if (graphingService.Exists)
-                {
-                    if (value)
-                        graphingService.Reference.Add(this);
-                    else
-                        graphingService.Reference.Remove(this);
-                }
+                if (value)
+                    GraphingService.Instance.Add(this);
+                else
+                    GraphingService.Instance.Remove(this);
             }
         }
 
@@ -60,8 +56,6 @@ namespace RoyTheunissen.Graphing
         
         private static readonly Graph dummyGraph = new Graph(DummyGraphName);
 
-        private static ServiceReference<GraphingService> graphingService = new ServiceReference<GraphingService>();
-        
         public delegate void LineAddedHandler(Graph graph, GraphLine line);
         public event LineAddedHandler LineAddedEvent;
 
@@ -209,7 +203,7 @@ namespace RoyTheunissen.Graphing
 
         public static Graph Get(string name, Color color)
         {
-            bool didExist = graphingService.Reference.GraphsByName.TryGetValue(name, out Graph graph);
+            bool didExist = GraphingService.Instance.GraphsByName.TryGetValue(name, out Graph graph);
             if (!didExist)
                 graph = Create(name, color);
             return graph;

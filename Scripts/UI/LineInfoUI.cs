@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +9,7 @@ namespace RoyTheunissen.Graphing.UI
     public sealed class LineInfoUI : MonoBehaviour
     {
         [SerializeField] private Image lineColorImage;
-        [SerializeField] private TMP_Text lineNameText;
+        [SerializeField] private Text lineNameText;
 
         public void Initialize(GraphLine line)
         {
