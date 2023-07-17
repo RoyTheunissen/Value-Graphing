@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace RoyTheunissen.Graphing
@@ -38,10 +39,10 @@ namespace RoyTheunissen.Graphing
 
         public void Load()
         {
-            LoadGraphingScene();
+            LoadGraphingSetup();
         }
 
-        private void LoadGraphingScene()
+        private void LoadGraphingSetup()
         {
             if (didLoadGraphingScene)
                 return;
@@ -49,13 +50,15 @@ namespace RoyTheunissen.Graphing
             didLoadGraphingScene = true;
             
 #if UNITY_EDITOR || ENABLE_GRAPHS
-            SceneManager.LoadScene("Graphing", LoadSceneMode.Additive);
+            GameObject rendererPrefab = Resources.Load<GameObject>("Graphing/Graphs Renderer");
+            GameObject rendererInstance = Object.Instantiate(rendererPrefab);
+            Object.DontDestroyOnLoad(rendererInstance);
 #endif // UNITY_EDITOR || ENABLE_GRAPHS
         }
 
         public void Add(Graph graph)
         {
-            LoadGraphingScene();
+            LoadGraphingSetup();
             
             graphsByName.Add(graph.Name, graph);
             

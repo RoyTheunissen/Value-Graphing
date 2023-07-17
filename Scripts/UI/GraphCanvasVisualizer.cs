@@ -10,19 +10,12 @@ namespace RoyTheunissen.Graphing.UI
     {
         [SerializeField] private RectTransform graphUiContainer;
         [SerializeField] private GraphUI graphUiPrefab;
-        
-        [SerializeField] private GameObject[] objectsThatShouldPersistBetweenScenes;
-        
+
         private Dictionary<Graph, GraphUI> graphUis = new Dictionary<Graph, GraphUI>();
         public Dictionary<Graph, GraphUI> GraphUis => graphUis;
 
         private void Awake()
         {
-            foreach (GameObject go in objectsThatShouldPersistBetweenScenes)
-            {
-                DontDestroyOnLoad(go);
-            }
-            
             CreateUiForPreExistingGraphs();
 
             GraphingService.Instance.GraphAddedEvent += HandleGraphAddedEvent;
