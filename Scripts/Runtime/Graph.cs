@@ -173,16 +173,25 @@ namespace RoyTheunissen.Graphing
 
         public Graph AddValue(float value, int lineIndex = 0)
         {
-            if (lineIndex < 0 || lineIndex >= lines.Count)
+            if (lineIndex < 0)
             {
                 Debug.LogWarning($"Tried to add value to invalid line index {lineIndex} for graph '{Name}'");
                 return this;
+            }
+
+            // If we didn't have a line yet for the specified index, make one now.
+            if (lineIndex >= lines.Count)
+            {
+                for (int i = lines.Count; i <= lineIndex; i++)
+                {
+                    AddLine($"Value #{i + 1}");
+                }
             }
             
             lines[lineIndex].AddValue(value);
             return this;
         }
-        
+
         public Graph AddValue(bool value, int lineIndex = 0)
         {
             return AddValue(value ? 1.0f : 0.0f, lineIndex);
