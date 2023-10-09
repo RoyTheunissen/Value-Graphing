@@ -191,10 +191,20 @@ namespace RoyTheunissen.Graphing
             lines[lineIndex].AddValue(value);
             return this;
         }
+        
+        public Graph AddValue(float value, string name)
+        {
+            return GetLine(name).AddValue(value).Graph;
+        }
 
         public Graph AddValue(bool value, int lineIndex = 0)
         {
             return AddValue(value ? 1.0f : 0.0f, lineIndex);
+        }
+        
+        public Graph AddValue(bool value, string name)
+        {
+            return AddValue(value ? 1.0f : 0.0f, name);
         }
         
         public Graph SetThreshold(float value, int lineIndex)
