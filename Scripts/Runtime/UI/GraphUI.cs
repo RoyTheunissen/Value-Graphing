@@ -29,6 +29,13 @@ namespace RoyTheunissen.Graphing.UI
             graphDataUi.Initialize(graph);
         }
 
+        private void Update()
+        {
+            // The graphing service is now a pure C# class and does not get an Update call.
+            // Let's update the graphs as they are being visualized instead.
+            graph.Update();
+        }
+
         public void Cleanup()
         {
             graph.LineAddedEvent -= HandleLineAddedEvent;

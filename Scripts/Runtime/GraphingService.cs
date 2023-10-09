@@ -71,15 +71,5 @@ namespace RoyTheunissen.Graphing
             
             GraphRemovedEvent?.Invoke(this, graph);
         }
-        
-#if UNITY_EDITOR || ENABLE_GRAPHS
-        private void Update()
-        {
-            foreach (KeyValuePair<string, Graph> kvp in graphsByName)
-            {
-                kvp.Value.Update();
-            }
-        }
-#endif // UNITY_EDITOR || ENABLE_GRAPHS
     }
 }
