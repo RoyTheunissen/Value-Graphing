@@ -1,0 +1,25 @@
+{
+  "name": "com.roytheunissen.value-graphing",
+  "displayName": "Value Graphing",
+  "version": "0.0.1",
+  "unity": "2021.3",
+  "description": "Provides a simple syntax for visualizing continuously changing values with on-screen graphs.",
+  "keywords": [
+    "graph",
+    "graphs",
+    "graphing",
+    "debugging",
+	"valuegraphing",
+  ],
+  "author": {
+    "name": "Roy Theunissen",
+    "url": "https://www.roytheunissen.com"
+  },
+  "category": "editor extensions",
+  "homepage": "https://github.com/RoyTheunissen/Value-Graphing",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RoyTheunissen/Value-Graphing"
+  },
+  "bugs": "https://github.com/RoyTheunissen/Value-Graphing/issues"
+}
