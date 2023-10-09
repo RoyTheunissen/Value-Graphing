@@ -176,8 +176,7 @@ namespace RoyTheunissen.Graphing
             lines[lineIndex].SetThreshold(value);
             return this;
         }
-
-#if UNITY_EDITOR || ENABLE_GRAPHS
+        
         public void Update()
         {
             foreach (GraphLine line in lines)
@@ -187,7 +186,6 @@ namespace RoyTheunissen.Graphing
             
             CullOldPoints();
         }
-#endif // UNITY_EDITOR || ENABLE_GRAPHS
 
         public static Graph Get(string name)
         {
@@ -310,13 +308,11 @@ namespace RoyTheunissen.Graphing
 
         public void Update()
         {
-#if UNITY_EDITOR || ENABLE_GRAPHS
             if (valueGetter != null)
             {
                 float currentValue = valueGetter();
                 AddValue(currentValue);
             }
-#endif // UNITY_EDITOR || ENABLE_GRAPHS
         }
     }
 
