@@ -9,6 +9,9 @@ namespace RoyTheunissen.Graphing
     /// </summary>
     public class Graph
     {
+        private static readonly Color[] DefaultLineColours =
+            { Color.green, Color.red, Color.blue, Color.yellow, Color.cyan, Color.magenta, Color.white };
+        
         public string Name => DefaultLine.Name;
         
         public Color Color => DefaultLine.Color;
@@ -69,7 +72,7 @@ namespace RoyTheunissen.Graphing
         }
 
         public Graph(string name, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
-            : this(name, Color.green, valueGetter, mode)
+            : this(name, GetDefaultColorForLine(0), valueGetter, mode)
         {
         }
 
@@ -124,12 +127,32 @@ namespace RoyTheunissen.Graphing
             return line;
         }
 
+        private static Color GetDefaultColorForLine(int index)
+        {
+            return DefaultLineColours[index % DefaultLineColours.Length];
+        }
+        
+        private Color GetDefaultColorForNewLine()
+        {
+            return GetDefaultColorForLine(lines.Count);
+        }
+
+        public GraphLine AddLine(string name)
+        {
+            return AddLine(name, GetDefaultColorForNewLine());
+        }
+
         public GraphLine GetLine(
             string name, Color color, Func<float> valueGetter = null,
             GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
         {
             bool didExist = linesByName.TryGetValue(name, out GraphLine line);
             return didExist ? line : AddLine(name, color, valueGetter, mode);
+        }
+
+        public GraphLine GetLine(string name)
+        {
+            return GetLine(name, GetDefaultColorForNewLine());
         }
 
         private void HandlePointAddedEvent(GraphLine graphLine, float value)
@@ -189,7 +212,7 @@ namespace RoyTheunissen.Graphing
 
         public static Graph Get(string name)
         {
-            return Get(name, Color.green);
+            return Get(name, GetDefaultColorForLine(0));
         }
 
         /// <summary>
