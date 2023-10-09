@@ -27,13 +27,22 @@ namespace RoyTheunissen.Graphing.UI
         [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 0);
         
 #if URP
+        private void Awake()
+        {
+            // Make sure this camera is of type Overlay.
+            UniversalAdditionalCameraData thisCamerasAdditionalCameraData = camera.GetUniversalAdditionalCameraData();
+            thisCamerasAdditionalCameraData.renderType = CameraRenderType.Overlay;
+        }
+
         private void OnEnable()
         {
             RenderPipelineManager.endCameraRendering += EndCameraRendering;
 
             // Make sure we add this camera to the camera stack.
             UniversalAdditionalCameraData additionalCameraData =
-                Camera.main.GetOrAddComponent<UniversalAdditionalCameraData>();
+                Camera.main.GetComponent<UniversalAdditionalCameraData>();
+            if (additionalCameraData == null)
+                additionalCameraData = Camera.main.gameObject.AddComponent<UniversalAdditionalCameraData>();
             additionalCameraData.cameraStack.Add(camera);
         }
 
