@@ -9,8 +9,6 @@ namespace RoyTheunissen.Graphing
     /// </summary>
     public class Graph
     {
-        private const string DummyGraphName = "_Dummy";
-
         public string Name => DefaultLine.Name;
         
         public Color Color => DefaultLine.Color;
@@ -52,10 +50,6 @@ namespace RoyTheunissen.Graphing
         public float TimeStart => Mathf.Max(startTime, Time.time - duration);
         public float TimeEnd => Time.time;
 
-        private bool IsDummy => Name == DummyGraphName;
-        
-        private static readonly Graph dummyGraph = new Graph(DummyGraphName);
-
         public delegate void LineAddedHandler(Graph graph, GraphLine line);
         public event LineAddedHandler LineAddedEvent;
 
@@ -71,8 +65,7 @@ namespace RoyTheunissen.Graphing
             AddLine(name, color, valueGetter, mode);
 
             // Auto-register.
-            if (!IsDummy)
-                IsRegistered = true;
+            IsRegistered = true;
         }
 
         public Graph(string name, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
@@ -216,26 +209,10 @@ namespace RoyTheunissen.Graphing
         /// <summary>
         /// Create a new line.
         /// </summary>
-        public static Graph Create(string name, Color color, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
+        public static Graph Create(string name, Color color, Func<float> valueGetter = null, 
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
-            return Create(true, name, color, valueGetter, mode, duration);
-        }
-
-        public static Graph Create(bool isGraphEnabled, string name, Color color, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
-        {
-            return !isGraphEnabled ? dummyGraph : new Graph(name, color, valueGetter, mode, duration);
-        }
-
-        public static Graph Create(string name, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
-        {
-            return Create(true, name, valueGetter, mode);
-        }
-
-        public static Graph Create(
-            bool isGraphEnabled, string name, Func<float> valueGetter = null,
-            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
-        {
-            return !isGraphEnabled ? dummyGraph : new Graph(name, valueGetter, mode);
+            return new Graph(name, color, valueGetter, mode, duration);
         }
     }
     
