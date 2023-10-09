@@ -201,14 +201,21 @@ namespace RoyTheunissen.Graphing
             return Get(name, Color.green);
         }
 
-        public static Graph Get(string name, Color color)
+        /// <summary>
+        /// Gets an existing line or creates one if it didn't exist.
+        /// </summary>
+        public static Graph Get(string name, Color color, Func<float> valueGetter = null, 
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             bool didExist = GraphingService.Instance.GraphsByName.TryGetValue(name, out Graph graph);
             if (!didExist)
-                graph = Create(name, color);
+                graph = Create(name, color, valueGetter, mode, duration);
             return graph;
         }
 
+        /// <summary>
+        /// Create a new line.
+        /// </summary>
         public static Graph Create(string name, Color color, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             return Create(true, name, color, valueGetter, mode, duration);
