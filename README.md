@@ -30,6 +30,8 @@ Graph.Get("Double Graph").AddValue(Mathf.Cos(Time.time * Mathf.PI) * 0.25f)
 ## Getting Started
 
 - Add Value Graphing to your Unity project (tips on how to install it are in the Installation section)
+- Does your project use URP? Define a scripting define symbol called `URP` in `Project Settings > Player` like so: ![image](https://github.com/RoyTheunissen/Value-Graphing/assets/3997055/e4609c07-2a59-40cf-a000-5fb877b3118a)
+
 - Call `Graph.Get("Name Of Your Value").AddValue(yourValue)`
 
 ***TIP**: If you want to prevent adding a using directive so you can remove it easier, try the fully qualified name instead, like so:*
