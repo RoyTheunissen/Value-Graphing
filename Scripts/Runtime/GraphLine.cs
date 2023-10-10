@@ -39,8 +39,8 @@ namespace RoyTheunissen.Graphing
         public delegate void PointAddedHandler(GraphLine graphLine, float value);
         public event PointAddedHandler PointAddedEvent;
 
-        public GraphLine(
-            Graph graph, int index, string name, Color color, Func<float> valueGetter = null, Modes mode = Modes.ContinuousLine)
+        public GraphLine(Graph graph, int index, string name, 
+            Color color, Modes mode = Modes.ContinuousLine, Func<float> valueGetter = null)
         {
             this.graph = graph;
             this.index = index;

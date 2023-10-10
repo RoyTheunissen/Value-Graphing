@@ -65,7 +65,7 @@ namespace RoyTheunissen.Graphing
             startTime = Time.time;
 
             // Create a default graph line. You can add others if you wish.
-            AddLine(name, color, valueGetter, mode);
+            AddLine(name, color, mode, valueGetter);
 
             // Auto-register.
             IsRegistered = true;
@@ -112,11 +112,10 @@ namespace RoyTheunissen.Graphing
             return this;
         }
 
-        public GraphLine AddLine(
-            string name, Color color, Func<float> valueGetter = null,
-            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
+        public GraphLine AddLine(string name, Color color, 
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, Func<float> valueGetter = null)
         {
-            GraphLine line = new GraphLine(this, lines.Count, name, color, valueGetter, mode);
+            GraphLine line = new GraphLine(this, lines.Count, name, color, mode, valueGetter);
             lines.Add(line);
             linesByName.Add(name, line);
 
@@ -143,11 +142,11 @@ namespace RoyTheunissen.Graphing
         }
 
         public GraphLine GetLine(
-            string name, Color color, Func<float> valueGetter = null,
-            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
+            string name, Color color,
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, Func<float> valueGetter = null)
         {
             bool didExist = linesByName.TryGetValue(name, out GraphLine line);
-            return didExist ? line : AddLine(name, color, valueGetter, mode);
+            return didExist ? line : AddLine(name, color, mode, valueGetter);
         }
 
         public GraphLine GetLine(string name)
