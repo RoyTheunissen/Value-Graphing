@@ -170,12 +170,12 @@ namespace RoyTheunissen.Graphing
             }
         }
 
-        public Graph AddValue(float value, int lineIndex = 0)
+        private GraphLine TryGetLineForValueAdding(int lineIndex)
         {
             if (lineIndex < 0)
             {
                 Debug.LogWarning($"Tried to add value to invalid line index {lineIndex} for graph '{Name}'");
-                return this;
+                return null;
             }
 
             // If we didn't have a line yet for the specified index, make one now.
@@ -186,8 +186,15 @@ namespace RoyTheunissen.Graphing
                     AddLine($"Value #{i + 1}");
                 }
             }
+
+            return lines[lineIndex];
+        }
+
+        public Graph AddValue(float value, int lineIndex = 0)
+        {
+            GraphLine graphLine = TryGetLineForValueAdding(lineIndex);
+            graphLine?.AddValue(value);
             
-            lines[lineIndex].AddValue(value);
             return this;
         }
         
@@ -198,12 +205,15 @@ namespace RoyTheunissen.Graphing
 
         public Graph AddValue(bool value, int lineIndex = 0)
         {
-            return AddValue(value ? 1.0f : 0.0f, lineIndex);
+            GraphLine graphLine = TryGetLineForValueAdding(lineIndex);
+            graphLine?.AddValue(value);
+            
+            return this;
         }
         
         public Graph AddValue(bool value, string name)
         {
-            return AddValue(value ? 1.0f : 0.0f, name);
+            return GetLine(name).AddValue(value).Graph;
         }
         
         public Graph SetThreshold(float value, int lineIndex)

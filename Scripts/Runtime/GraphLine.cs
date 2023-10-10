@@ -11,9 +11,9 @@ namespace RoyTheunissen.Graphing
     {
         public enum Modes
         {
-            ContinuousLine,
-            VerticalLineAtEveryPoint,
-            Threshold,
+            ContinuousLine, // Draw one line through all the points.
+            VerticalLines, // Draw a vertical line at the points. Useful for visualizing when 'moments' happen.
+            Threshold, // Draw a horizontal line at wherever you've defined SetThreshold. Useful for testing boundaries.
         }
         
         private Graph graph;
@@ -67,6 +67,14 @@ namespace RoyTheunissen.Graphing
             points.Add(new GraphPoint(Time.time, value));
             PointAddedEvent?.Invoke(this, value);
             return this;
+        }
+        
+        public GraphLine AddValue(bool value)
+        {
+            if (mode == Modes.VerticalLines && !value)
+                return this;
+            
+            return AddValue(value ? 1.0f : 0.0f);
         }
 
         public GraphLine SetThreshold(float value)

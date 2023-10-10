@@ -115,7 +115,8 @@ namespace RoyTheunissen.Graphing.UI
             }
             else
             {
-                for (int i = 1; i < pointCount; i++)
+                int startIndex = line.Mode == GraphLine.Modes.ContinuousLine ? 1 : 0;
+                for (int i = startIndex; i < pointCount; i++)
                 {
                     if (line.Points[i].time < graph.TimeStart)
                         continue;
@@ -123,7 +124,7 @@ namespace RoyTheunissen.Graphing.UI
                     if (line.Points[i].time > graph.TimeEnd)
                         return;
 
-                    if (line.Mode == GraphLine.Modes.VerticalLineAtEveryPoint)
+                    if (line.Mode == GraphLine.Modes.VerticalLines)
                     {
                         Vector2 posTop = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMax);
                         Vector2 posBottom = dataUi.GetNormalizedPosition(line.Points[i].time, graph.ValueMin);
