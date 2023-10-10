@@ -34,14 +34,14 @@ Graph.Get("Double Graph").AddValue(Mathf.Cos(Time.time * Mathf.PI) * 0.25f)
 
 - Call `Graph.Get("Name Of Your Value").AddValue(yourValue)`
 
-***TIP**: If you want to prevent adding a using directive so you can remove it easier, try the fully qualified name instead, like so:*
+***TIP**: If you want to prevent adding a using directive so you can remove it easier, try the fully qualified name instead:*
 `RoyTheunissen.Graphing.Graph.Get("Name Of Your Value").AddValue(yourValue)`
 
 ## Other features
 
 The syntax is optimized for fluid, one-line creation of simple graphs. However, it also supports explicitly creating and destroying graphs and lines.
 
-You can use `graph.GetLine` to get more advanced types of lines, such as vertical lines or horizontal lines ("thresholds").
+You can use `graph.GetLine` to get more advanced types of lines, such as vertical lines or horizontal lines.
 
 #### Horizontal Lines (Thresholds)
 
