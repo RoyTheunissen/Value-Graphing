@@ -43,6 +43,28 @@ The syntax is optimized for fluid, one-line creation of simple graphs. However, 
 
 You can use `graph.GetLine` to get more advanced types of lines, such as vertical lines or horizontal lines ("thresholds").
 
+#### Horizontal Lines (Thresholds)
+
+![Example](Documentation~/Example%20Threshold.gif)
+
+You can add a horizontal line for testing if a value meets a certain threshold. The syntax for that is as follows:
+
+```cs
+Graph.Get("Value To Compare").AddValue(Mathf.Sin(Time.time * Mathf.PI))
+        .GetLine("Threshold", Color.red, GraphLine.Modes.Threshold).SetThreshold(0.75f);
+```
+
+#### Vertical Lines (Moments)
+
+![Example](Documentation~/Example%20Timing.gif)
+
+You can also add a vertical line for testing when a specific condition is satisfied. The syntax for that is as follows:
+
+```cs
+Graph.Get("Value To Compare").AddValue(jumpValue)
+        .GetLine("SPACE key press", Color.red, GraphLine.Modes.VerticalLines).AddValue(Input.GetKeyDown(KeyCode.Space));
+```
+
 ## Compatibility
 
 It is made for Unity 2021 and BRP, but has been tested to work with Unity 2022 and URP.
