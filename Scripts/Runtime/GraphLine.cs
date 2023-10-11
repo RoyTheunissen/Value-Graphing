@@ -31,7 +31,7 @@ namespace RoyTheunissen.Graphing
         private Modes mode;
         public Modes Mode => mode;
 
-        private List<GraphPoint> points = new List<GraphPoint>();
+        private readonly List<GraphPoint> points = new List<GraphPoint>();
         public List<GraphPoint> Points => points;
 
         private Func<float> valueGetter;
