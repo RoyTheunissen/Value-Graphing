@@ -18,6 +18,13 @@ namespace RoyTheunissen.Graphing
 
         private float duration;
         public float Duration => duration;
+        
+        private bool shouldCullOldPoints = true;
+        public bool ShouldCullOldPoints
+        {
+            get => shouldCullOldPoints;
+            set => shouldCullOldPoints = value;
+        }
 
         private float startTime;
 
@@ -87,6 +94,12 @@ namespace RoyTheunissen.Graphing
             }
             lines.Clear();
             linesByName.Clear();
+        }
+        
+        public Graph SetShouldCullOldPoints(bool shouldCullOldPoints)
+        {
+            this.shouldCullOldPoints = shouldCullOldPoints;
+            return this;
         }
 
         public Graph SetDuration(float duration)
@@ -245,7 +258,8 @@ namespace RoyTheunissen.Graphing
                 line.Update();
             }
             
-            CullOldPoints();
+            if (shouldCullOldPoints)
+                CullOldPoints();
         }
 
         public static Graph Get(string name)
