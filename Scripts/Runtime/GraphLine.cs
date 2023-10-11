@@ -64,7 +64,10 @@ namespace RoyTheunissen.Graphing
         
         public GraphLine AddValue(float value)
         {
-            points.Add(new GraphPoint(Time.time, value));
+            if (graph.IsPaused)
+                return this;
+            
+            points.Add(new GraphPoint(graph.GraphTime, value));
             PointAddedEvent?.Invoke(this, value);
             return this;
         }
@@ -79,6 +82,9 @@ namespace RoyTheunissen.Graphing
 
         public GraphLine SetThreshold(float value)
         {
+            if (graph.IsPaused)
+                return this;
+            
             if (Mode == Modes.Threshold)
             {
                 points.Clear();

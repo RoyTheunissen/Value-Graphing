@@ -107,11 +107,14 @@ namespace RoyTheunissen.Graphing.UI
 
             if (line.Mode == GraphLine.Modes.Threshold)
             {
-                float thresholdValue = line.Points[line.Points.Count - 1].value;
-                Vector2 posLeft = dataUi.GetNormalizedPosition(graph.TimeStart, thresholdValue);
-                Vector2 posRight = dataUi.GetNormalizedPosition(graph.TimeEnd, thresholdValue);
-                tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posLeft));
-                tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posRight));
+                if (line.Points.Count > 0)
+                {
+                    float thresholdValue = line.Points[line.Points.Count - 1].value;
+                    Vector2 posLeft = dataUi.GetNormalizedPosition(graph.TimeStart, thresholdValue);
+                    Vector2 posRight = dataUi.GetNormalizedPosition(graph.TimeEnd, thresholdValue);
+                    tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posLeft));
+                    tempLineVertexPairs.Add(NormalizedGraphPositionToViewPosition(dataUi, posRight));
+                }
             }
             else
             {

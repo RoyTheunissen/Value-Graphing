@@ -27,6 +27,13 @@ namespace RoyTheunissen.Graphing
         }
 
         private float startTime;
+        
+        private bool isPaused;
+        public bool IsPaused
+        {
+            get => isPaused;
+            set => isPaused = value;
+        }
 
         private float valueMin;
         private float valueMax = 1.0f;
@@ -59,8 +66,11 @@ namespace RoyTheunissen.Graphing
 
         public int LineCount => lines.Count;
         
-        public float TimeStart => Mathf.Max(startTime, Time.time - duration);
-        public float TimeEnd => Time.time;
+        public float TimeStart => Mathf.Max(startTime, GraphTime - duration);
+        public float TimeEnd => GraphTime;
+
+        private float graphTime;
+        public float GraphTime => graphTime;
 
         public delegate void LineAddedHandler(Graph graph, GraphLine line);
         public event LineAddedHandler LineAddedEvent;
@@ -71,7 +81,7 @@ namespace RoyTheunissen.Graphing
         {
             this.duration = duration;
 
-            startTime = Time.time;
+            startTime = GraphTime;
 
             // Create a default graph line. You can add others if you wish.
             AddLine(name, color, mode, valueGetter);
@@ -99,6 +109,12 @@ namespace RoyTheunissen.Graphing
         public Graph SetShouldCullOldPoints(bool shouldCullOldPoints)
         {
             this.shouldCullOldPoints = shouldCullOldPoints;
+            return this;
+        }
+
+        public Graph SetIsPaused(bool isPaused)
+        {
+            this.isPaused = isPaused;
             return this;
         }
 
@@ -189,7 +205,7 @@ namespace RoyTheunissen.Graphing
         {
             for (int i = 0; i < lines.Count; i++)
             {
-                lines[i].CullPointsBefore(Time.time - duration);
+                lines[i].CullPointsBefore(GraphTime - duration);
             }
         }
 
@@ -253,6 +269,9 @@ namespace RoyTheunissen.Graphing
         
         public void Update()
         {
+            if (!IsPaused)
+                graphTime += Time.deltaTime;
+            
             foreach (GraphLine line in lines)
             {
                 line.Update();
@@ -286,6 +305,14 @@ namespace RoyTheunissen.Graphing
             GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             return new Graph(name, color, valueGetter, mode, duration);
+        }
+
+        public static void SetIsPausedForAll(bool isPaused)
+        {
+            foreach (KeyValuePair<string, Graph> nameGraphPair in GraphingService.Instance.GraphsByName)
+            {
+                nameGraphPair.Value.IsPaused = isPaused;
+            }
         }
 
         public GraphLine this[int index] => GetLine(index);
