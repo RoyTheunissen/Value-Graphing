@@ -44,11 +44,13 @@ namespace RoyTheunissen.Graphing
             }
         }
 
-        private GraphLine DefaultLine => lines[0];
+        public GraphLine DefaultLine => lines[0];
 
         private readonly List<GraphLine> lines = new List<GraphLine>();
         private readonly Dictionary<string, GraphLine> linesByName = new Dictionary<string, GraphLine>();
         public List<GraphLine> Lines => lines;
+
+        public int LineCount => lines.Count;
         
         public float TimeStart => Mathf.Max(startTime, Time.time - duration);
         public float TimeEnd => Time.time;
@@ -152,6 +154,14 @@ namespace RoyTheunissen.Graphing
         public GraphLine GetLine(string name)
         {
             return GetLine(name, GetDefaultColorForNewLine());
+        }
+        
+        public GraphLine GetLine(int index)
+        {
+            if (index < 0 || index >= lines.Count)
+                return null;
+            
+            return lines[index];
         }
 
         private void HandlePointAddedEvent(GraphLine graphLine, float value)
@@ -263,6 +273,9 @@ namespace RoyTheunissen.Graphing
         {
             return new Graph(name, color, valueGetter, mode, duration);
         }
+
+        public GraphLine this[int index] => GetLine(index);
+        public GraphLine this[string name] => GetLine(name);
     }
 
     public static class GraphExtensions
