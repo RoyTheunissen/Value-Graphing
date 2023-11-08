@@ -72,15 +72,13 @@ namespace RoyTheunissen.Graphing
             GraphRemovedEvent?.Invoke(this, graph);
         }
         
-#if UNITY_EDITOR
         // Needed to support domain reloading being disabled, in which case static fields are not reset between
         // sessions and need to be cleared manually.
-        [UnityEditor.InitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Initialize()
         {
             didCacheInstance = false;
             instance = null;
         }
-#endif // UNITY_EDITOR
     }
 }
