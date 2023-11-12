@@ -48,6 +48,9 @@ namespace RoyTheunissen.Graphing.UI
 
         private void EndCameraRendering(ScriptableRenderContext scriptableRenderContext, Camera camera)
         {
+            if (!camera.CompareTag("MainCamera"))
+                return;
+            
             OnPostRender();
         }
 
