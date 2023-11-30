@@ -36,7 +36,7 @@ namespace RoyTheunissen.Graphing.UI
 
         private void OnEnable()
         {
-            RenderPipelineManager.endCameraRendering += EndCameraRendering;
+            RenderPipelineManager.endFrameRendering += EndFrameRendering;
 
             // Make sure we add this camera to the camera stack.
             UniversalAdditionalCameraData additionalCameraData =
@@ -46,17 +46,27 @@ namespace RoyTheunissen.Graphing.UI
             additionalCameraData.cameraStack.Add(camera);
         }
 
-        private void EndCameraRendering(ScriptableRenderContext scriptableRenderContext, Camera camera)
+        private void EndFrameRendering(ScriptableRenderContext scriptableRenderContext, Camera[] cameras)
         {
-            if (!camera.CompareTag("MainCamera"))
-                return;
+            bool didFindCamera = false;
+            for (int i = 0; i < cameras.Length; i++)
+            {
+                if (cameras[i] == camera)
+                {
+                    didFindCamera = true;
+                    break;
+                }
+            }
             
+            if (!didFindCamera)
+                return;
+
             OnPostRender();
         }
 
         private void OnDisable()
         {
-            RenderPipelineManager.endCameraRendering -= EndCameraRendering;
+            RenderPipelineManager.endFrameRendering -= EndFrameRendering;
         }
 #endif // URP
 
