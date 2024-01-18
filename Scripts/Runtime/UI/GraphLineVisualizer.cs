@@ -1,6 +1,7 @@
 //#define NO_GRADIENTS
 // #define GRADIENT_FOR_SINGLE_LINES_ONLY
 
+using System;
 using System.Collections.Generic;
 using RoyTheunissen.Graphing.Utilities;
 using UnityEngine;
@@ -25,6 +26,11 @@ namespace RoyTheunissen.Graphing.UI
         [SerializeField] private GraphCanvasVisualizer graphCanvasVisualizer;
         [SerializeField] private Color gridColor = new Color(0.25f, 0.25f, 0.25f, 0);
         [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 0);
+
+        private bool isReadyToDraw;
+
+        private bool isRegisteredAtCamera;
+        private Camera cameraRegisteredAt;
         
 #if URP
         private void Awake()
@@ -38,12 +44,39 @@ namespace RoyTheunissen.Graphing.UI
         {
             RenderPipelineManager.endFrameRendering += EndFrameRendering;
 
+            RegisterAtCameraStack();
+        }
+
+        private void Update()
+        {
+            // If the camera we were registered at has been destroyed - for example due (re)loading a scene - make sure
+            // we register ourselves at the new one.
+            if (isRegisteredAtCamera && cameraRegisteredAt == null)
+                RegisterAtCameraStack();
+        }
+
+        private void RegisterAtCameraStack()
+        {
             // Make sure we add this camera to the camera stack.
+            Camera mainCamera = Camera.main;
+
+            if (mainCamera == null)
+            {
+                isReadyToDraw = false;
+                return;
+            }
+            
             UniversalAdditionalCameraData additionalCameraData =
-                Camera.main.GetComponent<UniversalAdditionalCameraData>();
+                mainCamera.GetComponent<UniversalAdditionalCameraData>();
             if (additionalCameraData == null)
-                additionalCameraData = Camera.main.gameObject.AddComponent<UniversalAdditionalCameraData>();
+                additionalCameraData = mainCamera.gameObject.AddComponent<UniversalAdditionalCameraData>();
             additionalCameraData.cameraStack.Add(camera);
+            
+            // Remember that we did the registration so we can check if the camera in question has been destroyed
+            cameraRegisteredAt = mainCamera;
+            isRegisteredAtCamera = true;
+            
+            isReadyToDraw = true;
         }
 
         private void EndFrameRendering(ScriptableRenderContext scriptableRenderContext, Camera[] cameras)
@@ -68,10 +101,18 @@ namespace RoyTheunissen.Graphing.UI
         {
             RenderPipelineManager.endFrameRendering -= EndFrameRendering;
         }
-#endif // URP
+#else
+        private void Awake()
+        {
+            isReadyToDraw = true;
+        }
+#endif
 
         private void OnPostRender()
         {
+            if (!isReadyToDraw)
+                return;
+            
             if (!material)
             {
                 Debug.LogError("Please Assign a material on the inspector");
