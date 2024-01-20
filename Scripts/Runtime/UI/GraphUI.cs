@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RoyTheunissen.Graphing.UI
 {
@@ -10,7 +12,6 @@ namespace RoyTheunissen.Graphing.UI
     {
         [SerializeField] private RectTransform headerContainer;
         [SerializeField] private LineInfoUI lineInfoUiPrefab;
-        
         [SerializeField] private GraphDataUI graphDataUi;
         public GraphDataUI DataUi => graphDataUi;
 
