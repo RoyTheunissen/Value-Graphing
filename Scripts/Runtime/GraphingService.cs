@@ -60,7 +60,13 @@ namespace RoyTheunissen.Graphing
         {
             LoadGraphingSetup();
             
-            graphsByName.Add(graph.Name, graph);
+            bool didAdd = graphsByName.TryAdd(graph.Name, graph);
+            if (!didAdd)
+            {
+                Debug.LogError($"Tried to register graph '{graph.Name}' but a graph was already registered with " +
+                               $"that name.");
+                return;
+            }
             
             GraphAddedEvent?.Invoke(this, graph);
         }
