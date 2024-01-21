@@ -10,13 +10,13 @@ Very often when you're working on something gameplay or animation related it's n
 
 Is it flat? Smooth? Spiky? I don't know about you but I find it impossible to understand that just by logging the value in the console. I need to see it.
 
-I really just want to be able to write one throwaway line of code that graphs a value for me, that I can then immediately remove once I understand the way the value works.
+There are two supported workflows in Value-Graphing:
 
-That's what Value Graphing is for!
+### Global Graphs
 
-![Example](Documentation~/Example.gif)
+When debugging a feature you're working on, you often want to just write one throwaway line of code that graphs a value for you, that you can then immediately remove once you understand the way a value works.
 
-And the syntax for making these graphs is two lines of code:
+That's what Value Graphing's "Global Graphs" are for! Very easy syntax, automatically drawn. Easy to remove again.
 
 ```cs
 // Simple graph with just one value
@@ -26,6 +26,11 @@ Graph.Get("Simple Graph").AddValue(Mathf.Sin(Time.time * Mathf.PI));
 Graph.Get("Double Graph").AddValue(Mathf.Cos(Time.time * Mathf.PI) * 0.25f)
     .AddValue(Time.time.Repeat(1.0f), "A Second Value");
 ```
+![Example](Documentation~/Example.gif)
+
+### Local Graphs
+
+If you have some data of which you'd like to see the shape / trends of at any given time via a debug menu, you can also embed a `Graph` prefab into your canvas and send values to that. That's the best way to create graphs that are meant to stick around during development, because it gives you more control over the size / layout and it integrates nicely with other UI.
 
 ## Getting Started
 
@@ -70,10 +75,6 @@ Graph.Get("Value To Compare").AddValue(jumpValue)
 It is made for Unity 2021 and BRP, but has been tested to work with Unity 2022 and URP.
 
 If you want my help in supporting an even earlier version, feel free to reach out.
-
-## Feature Wishlist
-
-- Being able to embed a graph in a canvas instead of being dynamically created
 
 ## Installation
 
