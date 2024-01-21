@@ -8,12 +8,20 @@ namespace RoyTheunissen.Graphing
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return property.GetPropertyHeightOfChildren();
+            GraphLine.Modes mode = (GraphLine.Modes)property.FindPropertyRelative("mode").intValue;
+            if (mode == GraphLine.Modes.Threshold)
+                return property.GetPropertyHeightOfChildren();
+            
+            return property.GetPropertyHeightOfChildren("threshold");
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            property.PropertyFieldForChildren(position);
+            GraphLine.Modes mode = (GraphLine.Modes)property.FindPropertyRelative("mode").intValue;
+            if (mode == GraphLine.Modes.Threshold)
+                property.PropertyFieldForChildren(position);
+            else
+                property.PropertyFieldForChildren(position, true, "threshold");
         }
     }
 }
