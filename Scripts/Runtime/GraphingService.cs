@@ -50,7 +50,7 @@ namespace RoyTheunissen.Graphing
             didLoadGraphingScene = true;
             
 #if UNITY_EDITOR || ENABLE_GRAPHS
-            GameObject rendererPrefab = Resources.Load<GameObject>("Graphing/Graphs Renderer");
+            GameObject rendererPrefab = Resources.Load<GameObject>("Graphing/Graph Service Renderer");
             GameObject rendererInstance = Object.Instantiate(rendererPrefab);
             Object.DontDestroyOnLoad(rendererInstance);
 #endif // UNITY_EDITOR || ENABLE_GRAPHS
@@ -60,7 +60,13 @@ namespace RoyTheunissen.Graphing
         {
             LoadGraphingSetup();
             
-            graphsByName.Add(graph.Name, graph);
+            bool didAdd = graphsByName.TryAdd(graph.Name, graph);
+            if (!didAdd)
+            {
+                Debug.LogError($"Tried to register graph '{graph.Name}' but a graph was already registered with " +
+                               $"that name.");
+                return;
+            }
             
             GraphAddedEvent?.Invoke(this, graph);
         }

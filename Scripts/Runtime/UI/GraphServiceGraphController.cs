@@ -4,9 +4,9 @@ using UnityEngine;
 namespace RoyTheunissen.Graphing.UI
 {
     /// <summary>
-    /// Responsible for creating and destroying canvas-based visualizers for graphs.
+    /// Responsible for creating and destroying canvas-based visualizers for graphs registered at the graph service.
     /// </summary>
-    public sealed class GraphCanvasVisualizer : MonoBehaviour
+    public sealed class GraphServiceGraphController : MonoBehaviour
     {
         [SerializeField] private RectTransform graphUiContainer;
         [SerializeField] private GraphUI graphUiPrefab;

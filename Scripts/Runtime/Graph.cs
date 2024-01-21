@@ -44,18 +44,9 @@ namespace RoyTheunissen.Graphing
         public bool IsRegistered
         {
             get => isRegistered;
-            set
-            {
-                if (isRegistered == value)
-                    return;
-                
-                isRegistered = value;
-                
-                if (value)
-                    GraphingService.Instance.Add(this);
-                else
-                    GraphingService.Instance.Remove(this);
-            }
+            
+            [Obsolete("Please use UpdateRegistration or Register/Unregister instead.")]
+            set => UpdateRegistration(value);
         }
 
         public GraphLine DefaultLine => lines[0];
@@ -87,7 +78,13 @@ namespace RoyTheunissen.Graphing
             AddLine(name, color, mode, valueGetter);
 
             // Auto-register.
-            IsRegistered = true;
+            // NOTE: As of 0.1.0 graphs no longer auto-register themselves in the constructor. If you want to create
+            // an auto-registered graph, use Graph.Create. This is to better support non-throwaway graphs that are
+            // part of some debugging GUI in the game. If you'd prefer it to work the way it did before,
+            // you must enable the VALUE_GRAPHING_GRAPH_CONSTRUCTOR_AUTO_REGISTERS scripting define symbol.
+#if VALUE_GRAPHING_GRAPH_CONSTRUCTOR_AUTO_REGISTERS
+            UpdateRegistration(true);
+#endif // VALUE_GRAPHING_GRAPH_CONSTRUCTOR_AUTO_REGISTERS
         }
 
         public Graph(string name, Func<float> valueGetter = null, GraphLine.Modes mode = GraphLine.Modes.ContinuousLine)
@@ -97,13 +94,43 @@ namespace RoyTheunissen.Graphing
 
         public void InternalCleanup()
         {
-            IsRegistered = false;
+            Unregister();
+
             for (int i = lines.Count - 1; i >= 0; i--)
             {
                 lines[i].PointAddedEvent -= HandlePointAddedEvent;
             }
             lines.Clear();
             linesByName.Clear();
+        }
+        
+        public Graph UpdateRegistration(bool value)
+        {
+            if (value)
+                Register();
+            else
+                Unregister();
+            return this;
+        }
+
+        public Graph Register()
+        {
+            if (isRegistered)
+                return this;
+            
+            isRegistered = true;
+            GraphingService.Instance.Add(this);
+            return this;
+        }
+        
+        public Graph Unregister()
+        {
+            if (!isRegistered)
+                return this;
+            
+            isRegistered = false;
+            GraphingService.Instance.Remove(this);
+            return this;
         }
         
         public Graph SetShouldCullOldPoints(bool shouldCullOldPoints)
@@ -281,30 +308,45 @@ namespace RoyTheunissen.Graphing
                 CullOldPoints();
         }
 
+        /// <summary>
+        /// Gets an existing global graph or creates one if it didn't exist.
+        /// Automatically visualized by the graph service.
+        /// </summary>
         public static Graph Get(string name)
         {
             return Get(name, GetDefaultColorForLine(0));
         }
 
         /// <summary>
-        /// Gets an existing line or creates one if it didn't exist.
+        /// Gets an existing global graph or creates one if it didn't exist.
+        /// Automatically visualized by the graph service.
         /// </summary>
         public static Graph Get(string name, Color color, Func<float> valueGetter = null, 
             GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             bool didExist = GraphingService.Instance.GraphsByName.TryGetValue(name, out Graph graph);
             if (!didExist)
-                graph = Create(name, color, valueGetter, mode, duration);
+                graph = CreateGlobal(name, color, valueGetter, mode, duration);
             return graph;
         }
 
         /// <summary>
-        /// Create a new line.
+        /// Create a new globally registered graph. Automatically visualized by the graph service.
         /// </summary>
+        [Obsolete("Graph.Create has been renamed to Graph.CreateGlobal for clarity.")]
         public static Graph Create(string name, Color color, Func<float> valueGetter = null, 
             GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
-            return new Graph(name, color, valueGetter, mode, duration);
+            return CreateGlobal(name, color, valueGetter, mode, duration).Register();
+        }
+        
+        /// <summary>
+        /// Create a new globally registered graph. Automatically visualized by the graph service.
+        /// </summary>
+        public static Graph CreateGlobal(string name, Color color, Func<float> valueGetter = null, 
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
+        {
+            return new Graph(name, color, valueGetter, mode, duration).Register();
         }
 
         public static void SetIsPausedForAll(bool isPaused)

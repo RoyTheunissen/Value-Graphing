@@ -10,9 +10,7 @@ namespace RoyTheunissen.Graphing.UI
     {
         [SerializeField] private RectTransform headerContainer;
         [SerializeField] private LineInfoUI lineInfoUiPrefab;
-        
         [SerializeField] private GraphDataUI graphDataUi;
-        public GraphDataUI DataUi => graphDataUi;
 
         private Graph graph;
 

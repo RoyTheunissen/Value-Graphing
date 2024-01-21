@@ -11,7 +11,7 @@ namespace RoyTheunissen.Graphing
         
         private void Awake()
         {
-            complexGraph = Graph.Create("Sine Wave", Color.green);
+            complexGraph = Graph.CreateGlobal("Sine Wave", Color.green);
             complexGraph.AddLine("Cosine Wave", Color.red);
         }
 
