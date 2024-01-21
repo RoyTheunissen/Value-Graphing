@@ -95,10 +95,10 @@ namespace RoyTheunissen.Graphing.UI
         {
             Rect lineAreaRect = linesArea.rectTransform.rect;
             
-            if (linesRenderTextureSizeCachedFor == lineAreaRect.size)
+            if (linesRenderTextureSizeCachedFor == lineAreaRect.size && linesRenderTexture != null)
                 return;
 
-            if (linesRenderTextureSizeCachedFor != null)
+            if (linesRenderTexture != null)
             {
                 RenderTexture.ReleaseTemporary(linesRenderTexture);
                 linesRenderTexture = null;
