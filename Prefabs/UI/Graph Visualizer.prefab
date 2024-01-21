@@ -516,7 +516,7 @@ GameObject:
   - component: {fileID: 7074326688616650156}
   - component: {fileID: 4370798804943173938}
   m_Layer: 5
-  m_Name: Graph UI
+  m_Name: Graph Visualizer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4836901923158115888}
   m_Layer: 0
-  m_Name: Graphs Renderer
+  m_Name: Graph Service Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

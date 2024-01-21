@@ -50,7 +50,7 @@ namespace RoyTheunissen.Graphing
             didLoadGraphingScene = true;
             
 #if UNITY_EDITOR || ENABLE_GRAPHS
-            GameObject rendererPrefab = Resources.Load<GameObject>("Graphing/Graphs Renderer");
+            GameObject rendererPrefab = Resources.Load<GameObject>("Graphing/Graph Service Renderer");
             GameObject rendererInstance = Object.Instantiate(rendererPrefab);
             Object.DontDestroyOnLoad(rendererInstance);
 #endif // UNITY_EDITOR || ENABLE_GRAPHS
