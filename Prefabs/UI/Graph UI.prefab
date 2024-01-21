@@ -502,7 +502,7 @@ MonoBehaviour:
   gridLinesContainer: {fileID: 8360673908005614461}
   linesArea: {fileID: 5534556083337456922}
   material: {fileID: 2100000, guid: 894cd9d284b82c348b3ad6d99bec7d24, type: 2}
-  gridColor: {r: 0, g: 0, b: 0, a: 1}
+  gridColor: {r: 0, g: 0, b: 0, a: 0.6392157}
   axisColor: {r: 0.050980397, g: 0.050980397, b: 0.050980397, a: 1}
 --- !u!1 &8593872736150834193
 GameObject:

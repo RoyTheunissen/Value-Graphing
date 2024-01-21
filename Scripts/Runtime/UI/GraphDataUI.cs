@@ -13,7 +13,7 @@ namespace RoyTheunissen.Graphing.UI
     /// </summary>
     public sealed class GraphDataUI : MonoBehaviour 
     {
-        private const float GradientUnderLineOpacity = 0.075f;
+        private const float GradientUnderLineOpacity = 0.3f;
         
         [Header("Grid Line Values")]
         [SerializeField] private RectTransform gridLineValuesContainer;
@@ -23,33 +23,15 @@ namespace RoyTheunissen.Graphing.UI
         [Header("Value Lines")]
         [SerializeField] private RawImage linesArea;
         [SerializeField] private Material material;
-        [SerializeField] private Color gridColor = new Color(0.25f, 0.25f, 0.25f, 0);
-        [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 0);
+        [SerializeField] private Color gridColor = new Color(0.25f, 0.25f, 0.25f, 1);
+        [SerializeField] private Color axisColor = new Color(0.5f, 0.5f, 0.5f, 1);
 
         private const int TargetLineCountHorizontal = 6;
         private const int TargetLineCountVertical = 10;
-
-        private Canvas canvas;
         
         private Graph graph;
         
         private Pool<GridLineValueUI> horizontalGridLineValues;
-        
-        private readonly Vector3[] cachedRectCorners = new Vector3[4];
-        private bool didCacheGridLinesCorners;
-
-        private Vector3[] GridLinesCorners
-        {
-            get
-            {
-                if (!didCacheGridLinesCorners)
-                {
-                    didCacheGridLinesCorners = true;
-                    gridLinesContainer.GetWorldCorners(cachedRectCorners);
-                }
-                return cachedRectCorners;
-            }
-        }
         
         private RenderTexture linesRenderTexture;
         private Vector2 linesRenderTextureSizeCachedFor;
@@ -60,8 +42,6 @@ namespace RoyTheunissen.Graphing.UI
         public void Initialize(Graph graph)
         {
             this.graph = graph;
-
-            canvas = GetComponentInParent<Canvas>();
             
             horizontalGridLineValues = new Pool<GridLineValueUI>(
                 () => Instantiate(gridLineValueUiPrefab, gridLineValuesContainer),
@@ -108,10 +88,8 @@ namespace RoyTheunissen.Graphing.UI
             if (lineAreaRect.size == Vector2.zero)
                 return;
             
-            linesRenderTexture = RenderTexture.GetTemporary(
-                (int)lineAreaRect.width, (int)lineAreaRect.height, 0, RenderTextureFormat.ARGB32, 0);
+            linesRenderTexture = RenderTexture.GetTemporary((int)lineAreaRect.width, (int)lineAreaRect.height, 0);
             linesRenderTexture.autoGenerateMips = false;
-            linesRenderTexture.filterMode = FilterMode.Point;
             linesRenderTextureSizeCachedFor = lineAreaRect.size;
             linesArea.texture = linesRenderTexture;
             linesArea.enabled = true;
@@ -128,17 +106,15 @@ namespace RoyTheunissen.Graphing.UI
             RenderTexture previousActiveRenderTexture = RenderTexture.active;
             RenderTexture.active = linesRenderTexture;
             
-            StartDrawing();
+            GL.Clear(true, true, Color.clear);
             
             ForEachHorizontalLine(DrawHorizontalLine);
             ForEachVerticalLine(DrawVerticalLine);
-
+            
             foreach (GraphLine line in graph.Lines)
             {
                 DrawGraphValueLine(graph, line);
             }
-            
-            StopDrawing();
             
             RenderTexture.active = previousActiveRenderTexture;
         }
@@ -149,7 +125,7 @@ namespace RoyTheunissen.Graphing.UI
         private void DrawGraphValueLine(Graph graph, GraphLine line)
         {
             Color color = line.Color;
-            Color lineColor = new Color(color.r, color.g, color.b, color.a / 2);
+            Color lineColor = new Color(color.r, color.g, color.b, color.a);
             int pointCount = line.Points.Count;
 
 #if NO_GRADIENTS
@@ -243,35 +219,41 @@ namespace RoyTheunissen.Graphing.UI
 	        GL.PushMatrix();
 	        material.SetPass(0);
 	        GL.LoadOrtho();
-	        
-	        GL.Clear(true, true, Color.clear);
         }
 
         private void StopDrawing()
         {
-	        GL.End();
-
 	        GL.PopMatrix();
         }
         
         private void StartDrawingQuads(Color color)
         {
+	        StartDrawing();
+	        
             GL.Begin(GL.QUADS);
             GL.Color(color);
         }
         
         private void StopDrawingQuads()
         {
+	        GL.End();
+	        
+	        StopDrawing();
         }
 
         private void StartDrawingLines(Color color)
         {
+	        StartDrawing();
+	        
             GL.Begin(GL.LINES);
             GL.Color(color);
         }
         
         private void StopDrawingLines()
         {
+	        GL.End();
+	        
+	        StopDrawing();
         }
 
         /// <summary>
