@@ -45,8 +45,8 @@ namespace RoyTheunissen.Graphing
         {
             get => isRegistered;
             
-            [Obsolete("Please use SetIsRegistered or Register/Unregister instead.")]
-            set => SetIsRegistered(value);
+            [Obsolete("Please use UpdateRegistration or Register/Unregister instead.")]
+            set => UpdateRegistration(value);
         }
 
         public GraphLine DefaultLine => lines[0];
@@ -83,7 +83,7 @@ namespace RoyTheunissen.Graphing
             // part of some debugging GUI in the game. If you'd prefer it to work the way it did before,
             // you must enable the VALUE_GRAPHING_GRAPH_CONSTRUCTOR_AUTO_REGISTERS scripting define symbol.
 #if VALUE_GRAPHING_GRAPH_CONSTRUCTOR_AUTO_REGISTERS
-            SetIsRegistered(true);
+            UpdateRegistration(true);
 #endif // VALUE_GRAPHING_GRAPH_CONSTRUCTOR_AUTO_REGISTERS
         }
 
@@ -104,7 +104,7 @@ namespace RoyTheunissen.Graphing
             linesByName.Clear();
         }
         
-        public Graph SetIsRegistered(bool value)
+        public Graph UpdateRegistration(bool value)
         {
             if (value)
                 Register();
