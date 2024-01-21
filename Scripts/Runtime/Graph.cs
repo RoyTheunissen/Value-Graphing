@@ -308,27 +308,42 @@ namespace RoyTheunissen.Graphing
                 CullOldPoints();
         }
 
+        /// <summary>
+        /// Gets an existing global graph or creates one if it didn't exist.
+        /// Automatically visualized by the graph service.
+        /// </summary>
         public static Graph Get(string name)
         {
             return Get(name, GetDefaultColorForLine(0));
         }
 
         /// <summary>
-        /// Gets an existing line or creates one if it didn't exist.
+        /// Gets an existing global graph or creates one if it didn't exist.
+        /// Automatically visualized by the graph service.
         /// </summary>
         public static Graph Get(string name, Color color, Func<float> valueGetter = null, 
             GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             bool didExist = GraphingService.Instance.GraphsByName.TryGetValue(name, out Graph graph);
             if (!didExist)
-                graph = Create(name, color, valueGetter, mode, duration);
+                graph = CreateGlobal(name, color, valueGetter, mode, duration);
             return graph;
         }
 
         /// <summary>
-        /// Create a new line.
+        /// Create a new globally registered graph. Automatically visualized by the graph service.
         /// </summary>
+        [Obsolete("Graph.Create has been renamed to Graph.CreateGlobal for clarity.")]
         public static Graph Create(string name, Color color, Func<float> valueGetter = null, 
+            GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
+        {
+            return CreateGlobal(name, color, valueGetter, mode, duration).Register();
+        }
+        
+        /// <summary>
+        /// Create a new globally registered graph. Automatically visualized by the graph service.
+        /// </summary>
+        public static Graph CreateGlobal(string name, Color color, Func<float> valueGetter = null, 
             GraphLine.Modes mode = GraphLine.Modes.ContinuousLine, float duration = 3.0f)
         {
             return new Graph(name, color, valueGetter, mode, duration).Register();
