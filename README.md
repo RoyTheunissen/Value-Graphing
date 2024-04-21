@@ -115,8 +115,9 @@ You can also install via git URL by adding this entry in your **manifest.json**
 ```
 
 ### Unity Package Manager
+From Window->Package Manager, click on the + sign and Add from git
 ```
-from Window->Package Manager, click on the + sign and Add from git: https://github.com/RoyTheunissen/Value-Graphing
+https://github.com/RoyTheunissen/Value-Graphing.git
 ```
 
 
