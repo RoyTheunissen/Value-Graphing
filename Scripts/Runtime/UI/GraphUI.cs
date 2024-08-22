@@ -8,6 +8,9 @@ namespace RoyTheunissen.Graphing.UI
     /// </summary>
     public sealed class GraphUI : MonoBehaviour
     {
+        [SerializeField] private bool hideLineNames;
+        
+        [Header("Dependencies")]
         [SerializeField] private RectTransform headerContainer;
         [SerializeField] private LineInfoUI lineInfoUiPrefab;
         [SerializeField] private GraphDataUI graphDataUi;
@@ -56,6 +59,9 @@ namespace RoyTheunissen.Graphing.UI
 
         private void CreateUiForLine(GraphLine line)
         {
+            if (hideLineNames)
+                return;
+            
             LineInfoUI lineInfoUi = Instantiate(lineInfoUiPrefab, headerContainer);
             lineInfoUi.Initialize(line);
             

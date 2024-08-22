@@ -36,7 +36,7 @@ namespace RoyTheunissen.Graphing.UI
         private RenderTexture linesRenderTexture;
         private Vector2 linesRenderTextureSizeCachedFor;
 
-        public delegate void HorizontalLineHandler(GraphDataUI graphDataUi, float value);
+        public delegate void HorizontalLineHandler(GraphDataUI graphDataUi, float value, int index);
         public delegate void VerticalLineHandler(GraphDataUI graphDataUi, float value);
 
         public void Initialize(Graph graph)
@@ -200,7 +200,7 @@ namespace RoyTheunissen.Graphing.UI
             DrawLine(tempLineVertexPairs, lineColor);
         }
 
-        private void DrawHorizontalLine(GraphDataUI dataUi, float value)
+        private void DrawHorizontalLine(GraphDataUI dataUi, float value, int index)
         {
             float y = dataUi.GetNormalizedPosition(0.0f, value).y;
             DrawLine(new Vector2(0.0f, y), new Vector2(1.0f, y), value.Approximately(0.0f) ? axisColor : gridColor);
@@ -304,12 +304,16 @@ namespace RoyTheunissen.Graphing.UI
         private void UpdateGrid()
         {
             int horizontalLinesUsed = 0;
-            void DrawHorizontalLine(GraphDataUI dataUi, float value)
+            int lineInterval = Mathf.Max(1, Mathf.RoundToInt(200 / gridLineValuesContainer.sizeDelta.y));
+            void DrawHorizontalLine(GraphDataUI dataUi, float value, int index)
             {
-                float y = GetNormalizedPosition(0.0f, value).y;
-                horizontalGridLineValues.AvailableObjects[horizontalLinesUsed].gameObject.SetActive(true);
-                horizontalGridLineValues.AvailableObjects[horizontalLinesUsed].UpdatePosition(y, value);
-                horizontalLinesUsed++;
+                if (index % lineInterval == 0)
+                {
+                    float y = GetNormalizedPosition(0.0f, value).y;
+                    horizontalGridLineValues.AvailableObjects[horizontalLinesUsed].gameObject.SetActive(true);
+                    horizontalGridLineValues.AvailableObjects[horizontalLinesUsed].UpdatePosition(y, value);
+                    horizontalLinesUsed++;
+                }
             }
             
             // Draw values next to the horizontal lines that denote the value range.
@@ -335,13 +339,16 @@ namespace RoyTheunissen.Graphing.UI
             horizontalGridLineValues.EnsureCapacity(horizontalLinesMax);
 
             // Draw the axis.
-            handler(this, 0.0f);
+            int index = 0;
+            handler(this, 0.0f, index);
 
             // Draw the horizontal grid lines based on the min and max values.
             for (float v = valueInterval; v.EqualOrSmaller(graph.ValueMax); v += valueInterval)
-                handler(this, v);
+                handler(this, v, ++index);
+
+            index = 0;
             for (float v = -valueInterval; v.EqualOrGreater(graph.ValueMin); v -= valueInterval)
-                handler(this, v);
+                handler(this, v, ++index);
         }
         
         /// <summary>
