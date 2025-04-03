@@ -59,8 +59,9 @@ If you have some data of which you'd like to see the shape / trends of at any gi
 
 - Call `Graph.Get("Name Of Your Value").AddValue(yourValue)`
 
-***TIP**: If you want to prevent adding a using directive so you can remove it easier, try the fully qualified name instead:*
-`RoyTheunissen.Graphing.Graph.Get("Name Of Your Value").AddValue(yourValue)`
+> [!TIP]
+> If you want to prevent adding a using directive so you can remove it easier, try the fully qualified name instead:*
+> `RoyTheunissen.Graphing.Graph.Get("Name Of Your Value").AddValue(yourValue)`
 
 ## Other features
 
